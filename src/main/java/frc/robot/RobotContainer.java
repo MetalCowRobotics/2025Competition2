@@ -28,6 +28,9 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.subsystems.Elevator;
+import frc.robot.commands.ArmCommands;
+import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -57,9 +60,25 @@ public class RobotContainer {
     private final Wrist wrist = new Wrist();
     private final Elevator elevator = new Elevator();
 
+    private final ArmCommands armCommands;
+
     public RobotContainer() {
         // Create vision subsystem after drivetrain
         vision = new Vision(drivetrain);
+        
+        // Initialize arm commands
+        armCommands = new ArmCommands(elevator, wrist, intake);
+        
+        // Register Named Commands for PathPlanner
+        NamedCommands.registerCommand("Go To L2", armCommands.goToL2());
+        NamedCommands.registerCommand("Go To L3", armCommands.goToL3());
+        NamedCommands.registerCommand("Go To L4", armCommands.goToL4());
+        NamedCommands.registerCommand("Go To Source", armCommands.goToSource());
+        NamedCommands.registerCommand("Go To Rest", armCommands.goToRest());
+        NamedCommands.registerCommand("Stop All", armCommands.stopAll());
+        NamedCommands.registerCommand("Start Intake", intake.startIntakeCommand());
+        NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
+        NamedCommands.registerCommand("Reverse Intake", intake.reverseIntakeCommand());
         
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -105,39 +124,19 @@ public class RobotContainer {
         );
 
         // Combined elevator and wrist controls for all positions
-        operatorController.a().onTrue(
-            elevator.goToL2Command()
-                .alongWith(wrist.goToL3Command())  // Using L3 for wrist since it doesn't have L2
-        );     // L2 position on A
-
-        operatorController.b().onTrue(
-            elevator.goToL3Command()
-                .alongWith(wrist.goToL3Command())
-        );     // L3 position on B
-
-        operatorController.y().onTrue(
-            elevator.goToL4Command()
-                .alongWith(wrist.goToL4Command())
-        );     // L4 position on Y
-
-        // Source position with intake
-        operatorController.x().onTrue(
-            elevator.goToSourceCommand()
-                .alongWith(wrist.goToSourceCommand())
-                .andThen(intake.startIntakeCommand())
-        );  // Source position + intake on operator X
-
-        // Rest position
-        joystick.leftBumper().onTrue(
-            elevator.goToRestCommand()
-                .alongWith(wrist.goToRestCommand())
-        );   // Rest position on driver left bumper
+        operatorController.a().onTrue(armCommands.goToL2());     // L2 position on A
+        operatorController.b().onTrue(armCommands.goToL3());     // L3 position on B
+        operatorController.y().onTrue(armCommands.goToL4());     // L4 position on Y
+        operatorController.x().onTrue(armCommands.goToSource()); // Source position + intake on X
+        joystick.leftBumper().onTrue(armCommands.goToRest());   // Rest position on driver left bumper
 
         // Stop intake
         operatorController.leftBumper().onTrue(intake.stopIntakeCommand());
         
-        // Reverse intake
-        operatorController.rightBumper().whileTrue(intake.reverseIntakeCommand());
+        // Reverse intake - toggle style
+        operatorController.rightBumper().onTrue(
+                intake.stopIntakeCommand()
+        );
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

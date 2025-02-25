@@ -34,11 +34,8 @@ public class Intake extends SubsystemBase {
     }
 
     public Command reverseIntakeCommand() {
-        return this.startEnd(
-            // When the command starts, run the intake in reverse
-            () -> intakeMotor.set(REVERSE_SPEED),
-            // When the command ends, stop the intake
-            () -> intakeMotor.set(0)
+        return this.runOnce(
+            () -> intakeMotor.set(REVERSE_SPEED)
         );
     }
 
