@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AlignmentConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class AlignToTarget extends Command {
     private final CommandSwerveDrivetrain drivetrain;
@@ -15,6 +16,7 @@ public class AlignToTarget extends Command {
     private final PIDController yController;
     private final PIDController rotationController;
     private final SwerveRequest.FieldCentric fieldCentric = new SwerveRequest.FieldCentric();
+    private static final double ACTIVATION_DISTANCE_METERS = 1.0;
 
     public AlignToTarget(CommandSwerveDrivetrain drivetrain, Pose2d targetPose) {
         this.drivetrain = drivetrain;
@@ -53,33 +55,74 @@ public class AlignToTarget extends Command {
     }
 
     @Override
-    public void execute() {
+    public boolean isFinished() {
         var currentPose = drivetrain.getState().Pose;
         
-        double xSpeed = xController.calculate(currentPose.getX());
-        double ySpeed = yController.calculate(currentPose.getY());
-        double rotationSpeed = rotationController.calculate(
-            currentPose.getRotation().getRadians()
+        // Calculate distance to target
+        double distance = new Translation2d(
+            currentPose.getX(), 
+            currentPose.getY()
+        ).getDistance(
+            new Translation2d(
+                targetPose.getX(), 
+                targetPose.getY()
+            )
         );
 
-        // Clamp speeds to reasonable values
-        xSpeed = MathUtil.clamp(xSpeed, -2.0, 2.0);
-        ySpeed = MathUtil.clamp(ySpeed, -2.0, 2.0);
-        rotationSpeed = MathUtil.clamp(rotationSpeed, -2.0, 2.0);
+        // If we're too far away, end the command
+        if (distance > ACTIVATION_DISTANCE_METERS) {
+            return true;
+        }
 
-        drivetrain.setControl(
-            fieldCentric
-                .withVelocityX(xSpeed)
-                .withVelocityY(ySpeed)
-                .withRotationalRate(rotationSpeed)
-        );
-    }
-
-    @Override
-    public boolean isFinished() {
+        // Otherwise, check if we've reached the target
         return xController.atSetpoint() &&
                yController.atSetpoint() &&
                rotationController.atSetpoint();
+    }
+
+    @Override
+    public void execute() {
+        var currentPose = drivetrain.getState().Pose;
+        
+        // Calculate distance to target
+        double distance = new Translation2d(
+            currentPose.getX(), 
+            currentPose.getY()
+        ).getDistance(
+            new Translation2d(
+                targetPose.getX(), 
+                targetPose.getY()
+            )
+        );
+
+        // Only run alignment if we're within activation distance
+        if (distance <= ACTIVATION_DISTANCE_METERS) {
+            double xSpeed = xController.calculate(currentPose.getX());
+            double ySpeed = yController.calculate(currentPose.getY());
+            double rotationSpeed = rotationController.calculate(
+                currentPose.getRotation().getRadians()
+            );
+
+            // Clamp speeds to reasonable values
+            xSpeed = MathUtil.clamp(xSpeed, -2.0, 2.0);
+            ySpeed = MathUtil.clamp(ySpeed, -2.0, 2.0);
+            rotationSpeed = MathUtil.clamp(rotationSpeed, -2.0, 2.0);
+
+            drivetrain.setControl(
+                fieldCentric
+                    .withVelocityX(xSpeed)
+                    .withVelocityY(ySpeed)
+                    .withRotationalRate(rotationSpeed)
+            );
+        } else {
+            // Stop if we're too far
+            drivetrain.setControl(
+                fieldCentric
+                    .withVelocityX(0)
+                    .withVelocityY(0)
+                    .withRotationalRate(0)
+            );
+        }
     }
 
     @Override

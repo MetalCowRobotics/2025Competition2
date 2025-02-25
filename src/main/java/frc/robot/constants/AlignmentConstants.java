@@ -19,6 +19,7 @@ public final class AlignmentConstants {
 
     // Blue Alliance Positions
     public static final Pose2d[] BLUE_POSITIONS = {
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
         new Pose2d(3.2, 4.18, Rotation2d.fromDegrees(-6)),
         new Pose2d(3.7, 2.99, Rotation2d.fromDegrees(55)),
         new Pose2d(5.03, 2.8, Rotation2d.fromDegrees(115)),
