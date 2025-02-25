@@ -104,22 +104,40 @@ public class RobotContainer {
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
-        // Elevator controls
-        operatorController.a().onTrue(elevator.goToL2Command());     // L2 position on A
-        operatorController.b().onTrue(elevator.goToL3Command());     // L3 position on B
-        operatorController.y().onTrue(elevator.goToL4Command());     // L4 position on Y
+        // Combined elevator and wrist controls for all positions
+        operatorController.a().onTrue(
+            elevator.goToL2Command()
+                .alongWith(wrist.goToL3Command())  // Using L3 for wrist since it doesn't have L2
+        );     // L2 position on A
 
-        // Keep existing controls for source and rest positions that match with wrist
+        operatorController.b().onTrue(
+            elevator.goToL3Command()
+                .alongWith(wrist.goToL3Command())
+        );     // L3 position on B
+
+        operatorController.y().onTrue(
+            elevator.goToL4Command()
+                .alongWith(wrist.goToL4Command())
+        );     // L4 position on Y
+
+        // Source position with intake
         operatorController.x().onTrue(
             elevator.goToSourceCommand()
                 .alongWith(wrist.goToSourceCommand())
                 .andThen(intake.startIntakeCommand())
         );  // Source position + intake on operator X
 
+        // Rest position
         joystick.leftBumper().onTrue(
             elevator.goToRestCommand()
                 .alongWith(wrist.goToRestCommand())
         );   // Rest position on driver left bumper
+
+        // Stop intake
+        operatorController.leftBumper().onTrue(intake.stopIntakeCommand());
+        
+        // Reverse intake
+        operatorController.rightBumper().whileTrue(intake.reverseIntakeCommand());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
