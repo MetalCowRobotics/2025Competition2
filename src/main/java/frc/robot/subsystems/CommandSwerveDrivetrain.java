@@ -317,12 +317,4 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement
      *     in the form [x, y, theta]ᵀ, with units in meters and radians.
      */
-    @Override
-    public void addVisionMeasurement(
-        Pose2d visionRobotPoseMeters,
-        double timestampSeconds,
-        Matrix<N3, N1> visionMeasurementStdDevs
-    ) {
-        super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
-    }
 }
