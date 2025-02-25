@@ -28,22 +28,26 @@ public class Vision extends SubsystemBase {
             SmartDashboard.putString("Limelight Fleft", fleft.pose.toString());
             SmartDashboard.putNumber("Limelight Fleft.pose.x", fleft.pose.getX());
             SmartDashboard.putNumber("Limelight Fleft.pose.y", fleft.pose.getY());
+            SmartDashboard.putNumber("Limelight Fleft Tag Count", fleft.tagCount);
 
             doRejectUpdate = shouldRejectUpdate(fleft, 6.0);
 
             if (!doRejectUpdate) {
-                // Set vision measurement standard deviations
+                // Calculate standard deviations based on number of tags and distance
+                double[] stdDevs = calculateStdDevs(fleft);
+                
                 drivetrain.addVisionMeasurement(
                     new Pose2d(
-                        -fleft.pose.getX(),
+                        fleft.pose.getX(),
                         fleft.pose.getY(),
-                        fleft.pose.getRotation().unaryMinus()
+                        fleft.pose.getRotation()
                     ),
                     fleft.timestampSeconds,
-                    VecBuilder.fill(0.5, 0.5, 9999999)
+                    VecBuilder.fill(stdDevs[0], stdDevs[1], stdDevs[2])
                 );
             }
         }
+        
 
         // Front Right Limelight
         doRejectUpdate = false;
@@ -52,17 +56,64 @@ public class Vision extends SubsystemBase {
             SmartDashboard.putString("Limelight Fright", fright.pose.toString());
             SmartDashboard.putNumber("Limelight Fright.pose.x", fright.pose.getX());
             SmartDashboard.putNumber("Limelight Fright.pose.y", fright.pose.getY());
+            SmartDashboard.putNumber("Limelight Fright Tag Count", fright.tagCount);
 
             doRejectUpdate = shouldRejectUpdate(fright, 0.9);
 
             if (!doRejectUpdate) {
+                double[] stdDevs = calculateStdDevs(fright);
+                
                 drivetrain.addVisionMeasurement(
                     fright.pose,
                     fright.timestampSeconds,
-                    VecBuilder.fill(0.5, 0.5, 9999999)
+                    VecBuilder.fill(stdDevs[0], stdDevs[1], stdDevs[2])
                 );
             }
         }
+    }
+
+    private double[] calculateStdDevs(PoseEstimate estimate) {
+        double xyStdDev = 1.0;  // Start with high uncertainty
+        double thetaStdDev = 1.0;
+
+        if (estimate.tagCount >= 2) {
+            // Multiple tags give us much better confidence
+            xyStdDev = 0.1;
+            thetaStdDev = 0.05;
+            
+            // Still adjust for distance to closest tag
+            double minDist = Double.POSITIVE_INFINITY;
+            for (var tag : estimate.rawFiducials) {
+                minDist = Math.min(minDist, tag.distToCamera);
+            }
+            // Add 5% uncertainty per meter of distance
+            double distanceMultiplier = 1.0 + (minDist * 0.05);
+            xyStdDev *= distanceMultiplier;
+            thetaStdDev *= distanceMultiplier;
+            
+        } else if (estimate.tagCount == 1 && estimate.rawFiducials.length == 1) {
+            // Single tag - base confidence on distance and ambiguity
+            double dist = estimate.rawFiducials[0].distToCamera;
+            double ambiguity = estimate.rawFiducials[0].ambiguity;
+            
+            // Start with moderate uncertainty
+            xyStdDev = 0.3;
+            thetaStdDev = 0.2;
+            
+            // Add 10% uncertainty per meter of distance
+            double distanceMultiplier = 1.0 + (dist * 0.1);
+            // Add up to 100% more uncertainty based on ambiguity
+            double ambiguityMultiplier = 1.0 + (ambiguity * 1.0);
+            
+            xyStdDev *= distanceMultiplier * ambiguityMultiplier;
+            thetaStdDev *= distanceMultiplier * ambiguityMultiplier;
+        }
+
+        // Add telemetry for debugging
+        SmartDashboard.putNumber("Vision XY StdDev", xyStdDev);
+        SmartDashboard.putNumber("Vision Rotation StdDev", thetaStdDev);
+        
+        return new double[] {xyStdDev, xyStdDev, thetaStdDev};
     }
 
     private boolean shouldRejectUpdate(PoseEstimate estimate, double maxDistance) {

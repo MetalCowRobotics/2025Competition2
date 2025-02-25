@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -317,4 +318,35 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement
      *     in the form [x, y, theta]ᵀ, with units in meters and radians.
      */
+    public void addVisionMeasurement(
+        Pose2d visionRobotPoseMeters,
+        double timestampSeconds,
+        Matrix<N3, N1> visionMeasurementStdDevs
+    ) {
+        setVisionMeasurementStdDevs(visionMeasurementStdDevs);
+        addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
+        
+        // Update gyro yaw to match vision when we have high confidence measurements
+        double rotationConfidence = visionMeasurementStdDevs.get(2, 0);
+        if (rotationConfidence < 0.1) {  // Only update if rotation confidence is high
+            // Calculate the difference between current and vision rotation
+            Rotation2d currentRotation = getState().Pose.getRotation();
+            Rotation2d visionRotation = visionRobotPoseMeters.getRotation();
+            Rotation2d rotationDifference = visionRotation.minus(currentRotation);
+            
+            // Only update if the difference is significant
+            if (Math.abs(rotationDifference.getDegrees()) > 2.0) {
+                // Create new pose with current position but vision's rotation
+                Pose2d newPose = new Pose2d(
+                    getState().Pose.getTranslation(),
+                    visionRotation
+                );
+                resetPose(newPose);
+                seedFieldCentric();
+                
+                // Log the rotation update
+                SmartDashboard.putNumber("Vision Rotation Update Delta", rotationDifference.getDegrees());
+            }
+        }
+    }
 }
