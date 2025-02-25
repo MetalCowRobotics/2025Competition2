@@ -24,6 +24,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.constants.AlignmentConstants;
 import frc.robot.commands.AlignToTarget;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.subsystems.Intake;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -40,13 +41,16 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController joystick = new CommandXboxController(0); // Driver controller
+    private final CommandXboxController operatorController = new CommandXboxController(1); // Operator controller
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private final Vision vision;
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
+
+    private final Intake intake = new Intake();
 
     public RobotContainer() {
         // Create vision subsystem after drivetrain
@@ -94,6 +98,12 @@ public class RobotContainer {
         joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
+
+        // Remove the old intake controls from driver controller
+        // And add them to operator controller instead
+        operatorController.x().whileTrue(intake.startIntakeCommand());
+        operatorController.rightBumper().whileTrue(intake.reverseIntakeCommand());
+        operatorController.leftBumper().onTrue(intake.stopIntakeCommand());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
