@@ -25,6 +25,7 @@ import frc.robot.constants.AlignmentConstants;
 import frc.robot.commands.AlignToTarget;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Wrist;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -51,6 +52,7 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     private final Intake intake = new Intake();
+    private final Wrist wrist = new Wrist();
 
     public RobotContainer() {
         // Create vision subsystem after drivetrain
@@ -99,11 +101,18 @@ public class RobotContainer {
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
-        // Remove the old intake controls from driver controller
-        // And add them to operator controller instead
-        operatorController.x().whileTrue(intake.startIntakeCommand());
+        // Create a combined command for source position with intake
+        Command sourceWithIntakeCommand = wrist.goToSourceCommand()
+            .andThen(intake.startIntakeCommand());
+
+        // Update the button bindings
+        operatorController.x().onTrue(sourceWithIntakeCommand);  // Source position + intake on operator X
+        operatorController.y().onTrue(wrist.goToL4Command());     // L4 position on operator Y
+        operatorController.b().onTrue(wrist.goToL3Command());     // L3 position on operator B
+        operatorController.a().onTrue(wrist.goToL3Command());     // L3 position also on operator A
+        joystick.leftBumper().onTrue(wrist.goToRestCommand());   // Rest position on driver left bumper
+        operatorController.leftBumper().onTrue(intake.stopIntakeCommand()); // Stop intake on operator left bumper
         operatorController.rightBumper().whileTrue(intake.reverseIntakeCommand());
-        operatorController.leftBumper().onTrue(intake.stopIntakeCommand());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
