@@ -8,19 +8,21 @@ import frc.robot.constants.AlignmentConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Translation2d;
+import java.util.function.Supplier;
 
 public class AlignToTarget extends Command {
     private final CommandSwerveDrivetrain drivetrain;
-    private final Pose2d targetPose;
+    private final Supplier<Pose2d> targetPoseSupplier;
+    private Pose2d targetPose;
     private final PIDController xController;
     private final PIDController yController;
     private final PIDController rotationController;
     private final SwerveRequest.FieldCentric fieldCentric = new SwerveRequest.FieldCentric();
     private static final double ACTIVATION_DISTANCE_METERS = 1.0;
 
-    public AlignToTarget(CommandSwerveDrivetrain drivetrain, Pose2d targetPose) {
+    public AlignToTarget(CommandSwerveDrivetrain drivetrain, Supplier<Pose2d> targetPoseSupplier) {
         this.drivetrain = drivetrain;
-        this.targetPose = targetPose;
+        this.targetPoseSupplier = targetPoseSupplier;
         
         xController = new PIDController(
             AlignmentConstants.XY_P,
@@ -49,6 +51,7 @@ public class AlignToTarget extends Command {
 
     @Override
     public void initialize() {
+        targetPose = targetPoseSupplier.get();
         xController.setSetpoint(targetPose.getX());
         yController.setSetpoint(targetPose.getY());
         rotationController.setSetpoint(targetPose.getRotation().getRadians());

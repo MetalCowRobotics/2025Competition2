@@ -23,6 +23,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
 import frc.robot.constants.AlignmentConstants;
 import frc.robot.commands.AlignToTarget;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -71,9 +72,27 @@ public class RobotContainer {
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         
-        // Alignment commands using X, B, and Y buttons
-        joystick.x().whileTrue(new AlignToTarget(drivetrain, AlignmentConstants.getNextBluePosition()));
-        joystick.b().whileTrue(new AlignToTarget(drivetrain, AlignmentConstants.getNextRedPosition()));
+        // X button for right side targets (both alliances)
+        joystick.x().whileTrue(
+            new AlignToTarget(drivetrain, () -> 
+                DriverStation.getAlliance().isPresent() && 
+                DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 
+                AlignmentConstants.getNextRedRightPosition() : 
+                AlignmentConstants.getNextBlueRightPosition()
+            )
+        );
+
+        // B button for left side targets (both alliances)
+        joystick.b().whileTrue(
+            new AlignToTarget(drivetrain, () -> 
+                DriverStation.getAlliance().isPresent() && 
+                DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 
+                AlignmentConstants.getNextRedLeftPosition() : 
+                AlignmentConstants.getNextBlueLeftPosition()
+            )
+        );
+
+        // Reset position indices with Y button
         joystick.y().onTrue(drivetrain.runOnce(AlignmentConstants::resetIndices));
 
         joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
@@ -82,9 +101,6 @@ public class RobotContainer {
         joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
-
-        // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
