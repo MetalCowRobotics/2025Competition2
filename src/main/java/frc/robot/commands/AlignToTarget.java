@@ -19,6 +19,11 @@ public class AlignToTarget extends Command {
     private final PIDController rotationController;
     private final SwerveRequest.FieldCentric fieldCentric = new SwerveRequest.FieldCentric();
     private static final double ACTIVATION_DISTANCE_METERS = 1.0;
+    private static final double SLOW_DOWN_DISTANCE_METERS = 0.127; // 5 inches in meters
+    private static final double MAX_SPEED_FAR = 4.0; // Maximum speed when far from target
+    private static final double MAX_SPEED_NEAR = 2.0; // Maximum speed when near target
+    private static final double MAX_ROTATION_SPEED_FAR = 4.0; // Maximum rotation speed when far
+    private static final double MAX_ROTATION_SPEED_NEAR = 2.0; // Maximum rotation speed when near
 
     public AlignToTarget(CommandSwerveDrivetrain drivetrain, Supplier<Pose2d> targetPoseSupplier) {
         this.drivetrain = drivetrain;
@@ -106,10 +111,25 @@ public class AlignToTarget extends Command {
                 currentPose.getRotation().getRadians()
             );
 
-            // Clamp speeds to reasonable values
-            xSpeed = MathUtil.clamp(xSpeed, -2.0, 2.0);
-            ySpeed = MathUtil.clamp(ySpeed, -2.0, 2.0);
-            rotationSpeed = MathUtil.clamp(rotationSpeed, -2.0, 2.0);
+            // Calculate speed limits based on distance
+            double speedScale;
+            double rotationScale;
+            if (distance > SLOW_DOWN_DISTANCE_METERS) {
+                // Far from target - use linear interpolation between max and min speeds
+                speedScale = MathUtil.interpolate(MAX_SPEED_NEAR, MAX_SPEED_FAR, 
+                    Math.min(distance / ACTIVATION_DISTANCE_METERS, 1.0));
+                rotationScale = MathUtil.interpolate(MAX_ROTATION_SPEED_NEAR, MAX_ROTATION_SPEED_FAR,
+                    Math.min(distance / ACTIVATION_DISTANCE_METERS, 1.0));
+            } else {
+                // Close to target - use precise control
+                speedScale = MAX_SPEED_NEAR;
+                rotationScale = MAX_ROTATION_SPEED_NEAR;
+            }
+
+            // Clamp speeds with adaptive limits
+            xSpeed = MathUtil.clamp(xSpeed, -speedScale, speedScale);
+            ySpeed = MathUtil.clamp(ySpeed, -speedScale, speedScale);
+            rotationSpeed = MathUtil.clamp(rotationSpeed, -rotationScale, rotationScale);
 
             drivetrain.setControl(
                 fieldCentric

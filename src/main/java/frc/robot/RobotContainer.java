@@ -72,28 +72,21 @@ public class RobotContainer {
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         
-        // X button for right side targets (both alliances)
+        // X button for left side targets
         joystick.x().whileTrue(
-            new AlignToTarget(drivetrain, () -> 
-                DriverStation.getAlliance().isPresent() && 
-                DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 
-                AlignmentConstants.getNextRedRightPosition() : 
-                AlignmentConstants.getNextBlueRightPosition()
-            )
+            new AlignToTarget(drivetrain, () -> {
+                var currentPose = drivetrain.getState().Pose;
+                return AlignmentConstants.findClosestLeftTarget(currentPose);
+            })
         );
 
-        // B button for left side targets (both alliances)
+        // B button for right side targets
         joystick.b().whileTrue(
-            new AlignToTarget(drivetrain, () -> 
-                DriverStation.getAlliance().isPresent() && 
-                DriverStation.getAlliance().get() == DriverStation.Alliance.Red ? 
-                AlignmentConstants.getNextRedLeftPosition() : 
-                AlignmentConstants.getNextBlueLeftPosition()
-            )
+            new AlignToTarget(drivetrain, () -> {
+                var currentPose = drivetrain.getState().Pose;
+                return AlignmentConstants.findClosestRightTarget(currentPose);
+            })
         );
-
-        // Reset position indices with Y button
-        joystick.y().onTrue(drivetrain.runOnce(AlignmentConstants::resetIndices));
 
         joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
