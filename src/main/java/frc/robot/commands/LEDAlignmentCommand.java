@@ -20,7 +20,7 @@ public class LEDAlignmentCommand extends Command {
 
     @Override
     public void initialize() {
-        ledSubsystem.setGreen();
+        ledSubsystem.setStrobeGreen();
     }
 
     @Override
@@ -38,18 +38,18 @@ public class LEDAlignmentCommand extends Command {
             
             // If we're close enough to the target, show red strobe
             if (distance < alignmentThreshold) {
-                ledSubsystem.setStrobeRed();
+                ledSubsystem.setWhite();
             } else {
-                ledSubsystem.setGreen();
+                ledSubsystem.setStrobeGreen();
             }
         } else {
-            ledSubsystem.setGreen();
+            ledSubsystem.setStrobeGreen();
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        ledSubsystem.setGreen();
+        ledSubsystem.setStrobeGreen();
     }
 
     @Override

@@ -9,27 +9,27 @@ public class LEDSubsystem extends SubsystemBase {
 
     public LEDSubsystem(int portNum) {
         lightController = new Spark(portNum);
-        setGreen(); // Default to green
+        setWhite(); // Default to white
     }
 
     public void setYellow() {
-        lightController.set(.65);
+        lightController.set(.69);
         color = "Yellow";
     }
 
     public void setPurple() {
-        lightController.set(.89);
+        lightController.set(.91);
         color = "Purple";
     }
 
-    public void setGreen() {
-        lightController.set(.71);
-        color = "Green";
+    public void setWhite() {
+        lightController.set(.21);
+        color = "White";
     }
 
-    public void setStrobeRed() {
-        lightController.set(-0.11); // Strobe red pattern
-        color = "Strobe Red";
+    public void setStrobeGreen() {
+        lightController.set(-0.75); // Strobe green pattern
+        color = "Strobe Green";
     }
 
     public String getColor() {

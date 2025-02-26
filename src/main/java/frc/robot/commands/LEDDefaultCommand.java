@@ -28,12 +28,12 @@ public class LEDDefaultCommand extends Command {
                 .getDistance(nearestTarget.getTranslation());
             
             if (distance < proximityThreshold) {
-                ledSubsystem.setStrobeRed();
+                ledSubsystem.setStrobeGreen();  // Flash green when in range
             } else {
-                ledSubsystem.setGreen();
+                ledSubsystem.setWhite();  // White when not in range
             }
         } else {
-            ledSubsystem.setGreen();
+            ledSubsystem.setWhite();  // White when no target found
         }
     }
 
