@@ -33,6 +33,11 @@ public class LEDSubsystem extends SubsystemBase {
         color = "Strobe Green";
     }
 
+    public void setFixedRed() {
+        lightController.set(0.61);  // Fixed palette red
+        color = "Fixed Red";
+    }
+
     public void setFixedGreen() {
         lightController.set(0.77);  // Fixed palette green
         color = "Fixed Green";

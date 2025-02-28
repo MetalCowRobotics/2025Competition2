@@ -24,6 +24,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.constants.AlignmentConstants;
 import frc.robot.commands.AlignToTarget;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
 import frc.robot.constants.ElevatorConstants;
@@ -89,7 +90,12 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Mode", autoChooser);
 
         // Set default command for LEDs
-        ledSubsystem.setDefaultCommand(new LEDDefaultCommand(ledSubsystem, drivetrain));
+        ledSubsystem.setDefaultCommand(new LEDDefaultCommand(
+            ledSubsystem, 
+            drivetrain, 
+            joystick, 
+            operatorController
+        ));
 
         configureBindings();
     }
@@ -107,6 +113,7 @@ public class RobotContainer {
         );
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+
         
         // X button for left side targets with LED feedback
         joystick.x().whileTrue(

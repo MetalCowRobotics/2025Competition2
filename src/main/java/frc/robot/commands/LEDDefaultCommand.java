@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,11 +12,21 @@ import frc.robot.constants.AlignmentConstants;
 public class LEDDefaultCommand extends Command {
     private final LEDSubsystem ledSubsystem;
     private final CommandSwerveDrivetrain drivetrain;
+    private final CommandXboxController driverController;
+    private final CommandXboxController operatorController;
     private final double proximityThreshold = 1.0; // 1 meter threshold
+    private final double rotationThreshold = 5.0; // 5 degrees threshold
+    private final double translationThreshold = 0.1; // 10cm threshold for final alignment
 
-    public LEDDefaultCommand(LEDSubsystem ledSubsystem, CommandSwerveDrivetrain drivetrain) {
+    public LEDDefaultCommand(
+            LEDSubsystem ledSubsystem, 
+            CommandSwerveDrivetrain drivetrain,
+            CommandXboxController driverController,
+            CommandXboxController operatorController) {
         this.ledSubsystem = ledSubsystem;
         this.drivetrain = drivetrain;
+        this.driverController = driverController;
+        this.operatorController = operatorController;
         addRequirements(ledSubsystem);
     }
 
@@ -28,13 +40,40 @@ public class LEDDefaultCommand extends Command {
                 .getDistance(nearestTarget.getTranslation());
             
             if (distance < proximityThreshold) {
-                ledSubsystem.setStrobeGreen();  // Flash green when in range
+                // Check both rotation and translation alignment
+                double angleError = Math.abs(nearestTarget.getRotation().minus(currentPose.getRotation()).getDegrees());
+                
+                // If we're close enough AND properly aligned
+                if (distance < translationThreshold && angleError < rotationThreshold) {
+                    ledSubsystem.setStrobeGreen();  // Red when fully aligned
+                    // Activate rumble on both controllers
+                    driverController.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+                    operatorController.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+                } else {
+                    ledSubsystem.setFixedWhite();  // Green when close but not fully aligned
+                    // Stop rumble
+                    driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+                    operatorController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+                }
             } else {
-                ledSubsystem.setFixedWhite();  // White when not in range
+                ledSubsystem.setFixedRed();  // White when not in range
+                // Stop rumble
+                driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+                operatorController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
             }
         } else {
-            ledSubsystem.setFixedWhite();  // White when no target found
+            ledSubsystem.setFixedRed();  // White when no target found
+            // Stop rumble
+            driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+            operatorController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
         }
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        // Make sure to stop rumble when command ends
+        driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+        operatorController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
     }
 
     @Override
