@@ -33,7 +33,6 @@ import frc.robot.commands.ArmCommands;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.commands.LEDAlignmentCommand;
 import frc.robot.commands.LEDDefaultCommand;
 
 public class RobotContainer {
