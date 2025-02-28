@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
 import frc.robot.constants.AlignmentConstants;
@@ -59,6 +60,7 @@ public class RobotContainer {
     private final Intake intake = new Intake();
     private final Wrist wrist = new Wrist();
     private final Elevator elevator = new Elevator();
+    private final Climb climb = new Climb();
 
     private final ArmCommands armCommands;
 
@@ -129,6 +131,10 @@ public class RobotContainer {
         operatorController.y().onTrue(armCommands.goToL4());     // L4 position on Y
         operatorController.x().onTrue(armCommands.goToSource()); // Source position + intake on X
         joystick.leftBumper().onTrue(armCommands.goToRest());   // Rest position on driver left bumper
+
+        // Climb controls 
+        operatorController.rightTrigger().onTrue(climb.lockIn()); // move climb up
+        operatorController.leftTrigger().onTrue(climb.retrieve()); // bring climb back
 
         // Stop intake
         operatorController.leftBumper().onTrue(intake.stopIntakeCommand());
