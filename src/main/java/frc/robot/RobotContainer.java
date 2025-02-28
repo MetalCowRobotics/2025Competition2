@@ -52,7 +52,7 @@ public class RobotContainer {
 
     private final Intake intake = new Intake();
     private final Wrist wrist = new Wrist();
-    private final Elevator elevator = new Elevator();
+    private final Elevator elevator = new Elevator(wrist);
 
     private final ArmCommands armCommands;
 
