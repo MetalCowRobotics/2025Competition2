@@ -40,17 +40,17 @@ public class LEDDefaultCommand extends Command {
                 
                 // If we're close enough AND properly aligned
                 if (distance < translationThreshold && angleError < rotationThreshold) {
-                    ledSubsystem.setStrobeGreen();  // Red when fully aligned
+                    ledSubsystem.setGreen();  // Red when fully aligned
                     // Activate rumble on both controllers
                     driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
                     operatorController.getHID().setRumble(RumbleType.kBothRumble, 1.0);
                 } else if (distance < proximityThreshold) {
-                    ledSubsystem.setFixedWhite();  // Green when close but not fully aligned
+                    ledSubsystem.setWhite();  // Green when close but not fully aligned
                     // Stop rumble
                     driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5);
                     operatorController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
                 } else {
-                ledSubsystem.setFixedRed();  // White when not in range
+                ledSubsystem.setRed();  // White when not in range
                 // Stop rumble
                 driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
                 operatorController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
