@@ -30,10 +30,10 @@ public class LEDDefaultCommand extends Command {
             if (distance < proximityThreshold) {
                 ledSubsystem.setStrobeGreen();  // Flash green when in range
             } else {
-                ledSubsystem.setWhite();  // White when not in range
+                ledSubsystem.setFixedWhite();  // White when not in range
             }
         } else {
-            ledSubsystem.setWhite();  // White when no target found
+            ledSubsystem.setFixedWhite();  // White when no target found
         }
     }
 

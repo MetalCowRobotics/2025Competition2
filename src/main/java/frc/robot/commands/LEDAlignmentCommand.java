@@ -38,7 +38,7 @@ public class LEDAlignmentCommand extends Command {
             
             // If we're close enough to the target, show red strobe
             if (distance < alignmentThreshold) {
-                ledSubsystem.setWhite();
+                ledSubsystem.setFixedWhite();
             } else {
                 ledSubsystem.setStrobeGreen();
             }
