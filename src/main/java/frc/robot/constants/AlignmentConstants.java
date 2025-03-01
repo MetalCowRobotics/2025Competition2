@@ -20,43 +20,42 @@ public final class AlignmentConstants {
 
     // Left Side Positions
     public static final Pose2d[] LEFT_POSITIONS = {
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-        new Pose2d(3.2, 4.18, Rotation2d.fromDegrees(-6)),
-        new Pose2d(3.7, 2.99, Rotation2d.fromDegrees(55)),
-        new Pose2d(5.03, 2.8, Rotation2d.fromDegrees(115)),
+        new Pose2d(3.2, 4.18, Rotation2d.fromDegrees(0)),
+        new Pose2d(3.7, 2.99, Rotation2d.fromDegrees(60)),
+        new Pose2d(5.03, 2.8, Rotation2d.fromDegrees(120)),
         new Pose2d(5.83, 3.87, Rotation2d.fromDegrees(180)),
-        new Pose2d(5.3, 5.07, Rotation2d.fromDegrees(-125)),
-        new Pose2d(3.9, 5.2, Rotation2d.fromDegrees(-63)),
-        new Pose2d(1.166, 1.006, Rotation2d.fromDegrees(0)),
-        new Pose2d(14.367, 3.781, Rotation2d.fromDegrees(0)),
-        new Pose2d(13.886, 5.012, Rotation2d.fromDegrees(0)),
-        new Pose2d(12.621, 5.242, Rotation2d.fromDegrees(0)),
-        new Pose2d(11.772, 4.231, Rotation2d.fromDegrees(0)),
-        new Pose2d(12.194, 3.077, Rotation2d.fromDegrees(0)),
-        new Pose2d(13.526, 2.848, Rotation2d.fromDegrees(0)),
-        new Pose2d(1.166, 7.057, Rotation2d.fromDegrees(0)),
-        new Pose2d(16.44, 7.009, Rotation2d.fromDegrees(0)),
-        new Pose2d(16.44, 1.010, Rotation2d.fromDegrees(0))
+        new Pose2d(5.3, 5.07, Rotation2d.fromDegrees(240)),
+        new Pose2d(3.9, 5.2, Rotation2d.fromDegrees(300)),
+        new Pose2d(13.87, 5.133, Rotation2d.fromDegrees(-120)), // RC
+        new Pose2d(12.504, 5.316, Rotation2d.fromDegrees(-60)),// RE
+        new Pose2d(11.673, 4.196, Rotation2d.fromDegrees(0)),//RG
+        new Pose2d(12.237, 2.924, Rotation2d.fromDegrees(60)),//RI
+        new Pose2d(13.581, 2.753, Rotation2d.fromDegrees(120)),//RK
+        new Pose2d(14.426, 3.868, Rotation2d.fromDegrees(180)),//RA
+        // new Pose2d(1.166, 7.057, Rotation2d.fromDegrees(0)),
+        // new Pose2d(16.44, 7.009, Rotation2d.fromDegrees(0)),
+        // new Pose2d(16.44, 1.010, Rotation2d.fromDegrees(0))
     };
 
     // Right Side Positions
     public static final Pose2d[] RIGHT_POSITIONS = {
-        new Pose2d(3.15, 3.8, Rotation2d.fromDegrees(0)),
-        new Pose2d(4.0, 2.8, Rotation2d.fromDegrees(55.5)),
-        new Pose2d(5.31, 3.02, Rotation2d.fromDegrees(115)),
-        new Pose2d(5.8, 4.21, Rotation2d.fromDegrees(180)),
-        new Pose2d(4.96, 5.28, Rotation2d.fromDegrees(-125)),
-        new Pose2d(3.62, 5.03, Rotation2d.fromDegrees(-63)),
+        new Pose2d(3.15, 3.8, Rotation2d.fromDegrees(0)),//A
+        new Pose2d(4.0, 2.8, Rotation2d.fromDegrees(60)),//C
+        new Pose2d(5.31, 3.02, Rotation2d.fromDegrees(120)),//E
+        new Pose2d(5.8, 4.21, Rotation2d.fromDegrees(180)),//G
+        new Pose2d(4.96, 5.28, Rotation2d.fromDegrees(240)),//I
+        new Pose2d(3.62, 5.03, Rotation2d.fromDegrees(300)),//K
         new Pose2d(1.214, 1.006, Rotation2d.fromDegrees(225)),
-        new Pose2d(14.367, 4.106, Rotation2d.fromDegrees(0)),
-        new Pose2d(13.614, 5.188, Rotation2d.fromDegrees(0)),
-        new Pose2d(12.346, 5.090, Rotation2d.fromDegrees(0)),
-        new Pose2d(11.781, 3.897, Rotation2d.fromDegrees(0)),
-        new Pose2d(12.508, 2.899, Rotation2d.fromDegrees(0)),
-        new Pose2d(13.809, 2.985, Rotation2d.fromDegrees(0)),
-        new Pose2d(1.198, 7.013, Rotation2d.fromDegrees(135)),
-        new Pose2d(16.382, 7.009, Rotation2d.fromDegrees(0)),
-        new Pose2d(16.470, 1.096, Rotation2d.fromDegrees(0))
+        new Pose2d(13.574, 5.307, Rotation2d.fromDegrees(-120)),//RD
+        new Pose2d(12.251, 5.140, Rotation2d.fromDegrees(-60)),//RF
+        new Pose2d(11.682, 3.867, Rotation2d.fromDegrees(0)),//RH
+        new Pose2d(12.502, 2.772, Rotation2d.fromDegrees(60)),//RJ
+        new Pose2d(13.884, 2.897, Rotation2d.fromDegrees(120)),//Rl
+        new Pose2d(14.431, 4.203, Rotation2d.fromDegrees(180)),//RB
+        // new Pose2d(13.809, 2.985, Rotation2d.fromDegrees(0)),
+        // new Pose2d(1.198, 7.013, Rotation2d.fromDegrees(135)),
+        // new Pose2d(16.382, 7.009, Rotation2d.fromDegrees(0)),
+        // new Pose2d(16.470, 1.096, Rotation2d.fromDegrees(0))
     };
 
     // Method to find closest target
@@ -88,5 +87,20 @@ public final class AlignmentConstants {
             }
         }
         return closest;
+    }
+
+    public static Pose2d findClosestTarget(Pose2d currentPose) {
+        // Combine your left and right target logic here
+        Pose2d leftTarget = findClosestLeftTarget(currentPose);
+        Pose2d rightTarget = findClosestRightTarget(currentPose);
+        
+        if (leftTarget == null) return rightTarget;
+        if (rightTarget == null) return leftTarget;
+        
+        // Return the closer target
+        double leftDistance = currentPose.getTranslation().getDistance(leftTarget.getTranslation());
+        double rightDistance = currentPose.getTranslation().getDistance(rightTarget.getTranslation());
+        
+        return leftDistance < rightDistance ? leftTarget : rightTarget;
     }
 } 

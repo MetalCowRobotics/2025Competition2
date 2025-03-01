@@ -8,34 +8,27 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
 import frc.robot.constants.AlignmentConstants;
 import frc.robot.commands.AlignToTarget;
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
-import frc.robot.constants.ElevatorConstants;
 import frc.robot.subsystems.Elevator;
 import frc.robot.commands.ArmCommands;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.commands.LEDDefaultCommand;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -59,10 +52,11 @@ public class RobotContainer {
 
     private final Intake intake = new Intake();
     private final Wrist wrist = new Wrist();
-    private final Elevator elevator = new Elevator();
-    private final Climb climb = new Climb();
+    private final Elevator elevator = new Elevator(wrist);
 
     private final ArmCommands armCommands;
+
+    private final LEDSubsystem ledSubsystem = new LEDSubsystem(0);
 
     public RobotContainer() {
         // Create vision subsystem after drivetrain
@@ -85,6 +79,14 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
 
+        // Set default command for LEDs
+        ledSubsystem.setDefaultCommand(new LEDDefaultCommand(
+            ledSubsystem, 
+            drivetrain, 
+            joystick, 
+            operatorController
+        ));
+
         configureBindings();
     }
 
@@ -101,8 +103,9 @@ public class RobotContainer {
         );
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+
         
-        // X button for left side targets
+        // X button for left side targets with LED feedback
         joystick.x().whileTrue(
             new AlignToTarget(drivetrain, () -> {
                 var currentPose = drivetrain.getState().Pose;
@@ -110,7 +113,7 @@ public class RobotContainer {
             })
         );
 
-        // B button for right side targets
+        // B button for right side targets with LED feedback
         joystick.b().whileTrue(
             new AlignToTarget(drivetrain, () -> {
                 var currentPose = drivetrain.getState().Pose;
@@ -132,12 +135,8 @@ public class RobotContainer {
         operatorController.x().onTrue(armCommands.goToSource()); // Source position + intake on X
         joystick.leftBumper().onTrue(armCommands.goToRest());   // Rest position on driver left bumper
 
-        // Climb controls 
-        operatorController.rightTrigger().onTrue(climb.lockIn()); // move climb up
-        operatorController.leftTrigger().onTrue(climb.retrieve()); // bring climb back
-
         // Stop intake
-        operatorController.leftBumper().onTrue(intake.stopIntakeCommand());
+        operatorController.leftBumper().onTrue(intake.reverseIntakeCommand());
         
         // Reverse intake - toggle style
         operatorController.rightBumper().onTrue(
