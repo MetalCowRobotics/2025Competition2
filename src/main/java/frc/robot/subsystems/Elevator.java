@@ -49,10 +49,10 @@ public class Elevator extends SubsystemBase {
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .p(1)
-            .d(0.01)
+            .d(0.015)
             .i(0.004)
             .iZone(0.7)
-            .outputRange(-0.5, 0.5)
+            .outputRange(-0.9, 0.8)
             .maxMotion
             .maxVelocity(6000)
             .maxAcceleration(4000)

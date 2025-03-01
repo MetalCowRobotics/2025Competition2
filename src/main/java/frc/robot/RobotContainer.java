@@ -28,7 +28,7 @@ import frc.robot.commands.LEDDefaultCommand;
 import frc.robot.subsystems.Climb;
 
 public class RobotContainer {
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)/2; // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second
 
     /* Setting up bindings for necessary control of the swerve drive platform */

@@ -2,7 +2,7 @@ package frc.robot.constants;
 
 public final class WristConstants {
     public static final double L4_Angle = 13;
-    public static final double L3_Angle = 5.3;
+    public static final double L3_Angle = 11;
     public static final double Source_Angle = 5.3;
     public static final double Rest_Angle = 0;
 

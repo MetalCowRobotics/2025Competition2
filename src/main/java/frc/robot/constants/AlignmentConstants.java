@@ -15,8 +15,8 @@ public final class AlignmentConstants {
     public static final double ROTATION_D = 0.1;  // Added small derivative gain
 
     // Tolerance for considering alignment complete
-    public static final double POSITION_TOLERANCE_METERS = 0.05; // 5 cm
-    public static final double ROTATION_TOLERANCE_DEGREES = 2.0; // 2 degrees
+    public static final double POSITION_TOLERANCE_METERS = 0.03; // 5 cm
+    public static final double ROTATION_TOLERANCE_DEGREES = 1.0; // 2 degrees
 
     // Left Side Positions
     public static final Pose2d[] LEFT_POSITIONS = {
@@ -26,12 +26,13 @@ public final class AlignmentConstants {
         new Pose2d(5.83, 3.87, Rotation2d.fromDegrees(180)),
         new Pose2d(5.3, 5.07, Rotation2d.fromDegrees(240)),
         new Pose2d(3.9, 5.2, Rotation2d.fromDegrees(300)),
-        new Pose2d(13.87, 5.133, Rotation2d.fromDegrees(-120)), // RC
-        new Pose2d(12.504, 5.316, Rotation2d.fromDegrees(-60)),// RE
+        new Pose2d(13.89, 5.06, Rotation2d.fromDegrees(-120)), // RC
+        new Pose2d(12.504, 5.22, Rotation2d.fromDegrees(-60)),// RE
         new Pose2d(11.673, 4.196, Rotation2d.fromDegrees(0)),//RG
-        new Pose2d(12.237, 2.924, Rotation2d.fromDegrees(60)),//RI
-        new Pose2d(13.581, 2.753, Rotation2d.fromDegrees(120)),//RK
-        new Pose2d(14.426, 3.868, Rotation2d.fromDegrees(180)),//RA
+        new Pose2d(12.32, 3.4, Rotation2d.fromDegrees(60)),//RI
+        new Pose2d(13.54, 2.87, Rotation2d.fromDegrees(120)),//RK
+        new Pose2d(14.37, 3.89, Rotation2d.fromDegrees(180)),//RA
+        new Pose2d(16.39, 1.03, Rotation2d.fromDegrees(-60)),//RA
         // new Pose2d(1.166, 7.057, Rotation2d.fromDegrees(0)),
         // new Pose2d(16.44, 7.009, Rotation2d.fromDegrees(0)),
         // new Pose2d(16.44, 1.010, Rotation2d.fromDegrees(0))
@@ -47,11 +48,11 @@ public final class AlignmentConstants {
         new Pose2d(3.62, 5.03, Rotation2d.fromDegrees(300)),//K
         new Pose2d(1.214, 1.006, Rotation2d.fromDegrees(225)),
         new Pose2d(13.574, 5.307, Rotation2d.fromDegrees(-120)),//RD
-        new Pose2d(12.251, 5.140, Rotation2d.fromDegrees(-60)),//RF
+        new Pose2d(12.23, 5.02, Rotation2d.fromDegrees(-60)),//RF
         new Pose2d(11.682, 3.867, Rotation2d.fromDegrees(0)),//RH
-        new Pose2d(12.502, 2.772, Rotation2d.fromDegrees(60)),//RJ
-        new Pose2d(13.884, 2.897, Rotation2d.fromDegrees(120)),//Rl
-        new Pose2d(14.431, 4.203, Rotation2d.fromDegrees(180)),//RB
+        new Pose2d(12.54, 2.84, Rotation2d.fromDegrees(60)),//RJ
+        new Pose2d(13.83, 2.98, Rotation2d.fromDegrees(120)),//Rl
+        new Pose2d(14.35, 4.2, Rotation2d.fromDegrees(180)),//RB
         // new Pose2d(13.809, 2.985, Rotation2d.fromDegrees(0)),
         // new Pose2d(1.198, 7.013, Rotation2d.fromDegrees(135)),
         // new Pose2d(16.382, 7.009, Rotation2d.fromDegrees(0)),
