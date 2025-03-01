@@ -9,40 +9,24 @@ public class LEDSubsystem extends SubsystemBase {
 
     public LEDSubsystem(int portNum) {
         lightController = new Spark(portNum);
-        setFixedWhite(); // Default to white
     }
 
-    public void setYellow() {
-        lightController.set(0.69);  // Fixed palette yellow
-        color = "Yellow";
-    }
-
-    public void setPurple() {
-        lightController.set(0.91);  // Fixed palette purple
-        color = "Purple";
-    }
-
-    public void setFixedWhite() {
+    public void setWhite() {
         lightController.set(0.93);  // Fixed palette white
         color = "White";
     }
 
-    public void setStrobeGreen() {
+    public void setGreen() {
         // Options for darker/more vibrant green:
         lightController.set(0.77);  // Solid Dark Green
         color = "Strobe Green";
     }
 
-    public void setFixedRed() {
+    public void setRed() {
         lightController.set(0.61);  // Fixed palette red
         color = "Fixed Red";
     }
-
-    public void setFixedGreen() {
-        lightController.set(0.77);  // Fixed palette green
-        color = "Fixed Green";
-    }
-
+    
     public String getColor() {
         return color;
     }

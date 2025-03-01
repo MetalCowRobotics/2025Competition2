@@ -24,8 +24,11 @@ public class Elevator extends SubsystemBase {
     private final SparkLimitSwitch bottomSwitch;
     private final SparkLimitSwitch topSwitch;
     private double targetLocation = 0;
+    private final Wrist wrist;
+    private double desiredTarget = 0;
 
-    public Elevator() {
+    public Elevator(Wrist wrist) {
+        this.wrist = wrist;
         elevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
         closedLoopController = elevatorMotor.getClosedLoopController();
         bottomSwitch = elevatorMotor.getReverseLimitSwitch();
@@ -60,8 +63,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setTargetLocation(double targetLocation) {
-        this.targetLocation = targetLocation;
-        closedLoopController.setReference(targetLocation, ControlType.kMAXMotionPositionControl);
+        this.desiredTarget = targetLocation;
     }
 
     private void zeroEncoder() {
@@ -91,9 +93,47 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
+        // If elevator at or below L3 but wanting to go to L4, make sure wrist is tucked in (>=11.5)
+        // If elevator is at L4 but wanting to go below L4, wait until wrist is tucked in (>= 11.5)
+        boolean atOrBelowL3 = (getPosition() - ElevatorConstants.L3_Distance) < 3.0;
+
+        if (desiredTarget > ElevatorConstants.L3_Distance && atOrBelowL3) {
+            if (wrist.isAtSafeAngle()) {
+                // wrist tucked so we can to L4
+                this.targetLocation = desiredTarget;
+                closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+                wrist.resume();
+            } else {
+                // wanting to go to L4 but wrist is out so wait for next periodic
+                wrist.tuck();
+            }
+        } else if (desiredTarget <= ElevatorConstants.L4_Distance && !atOrBelowL3) {
+            if (wrist.isAtSafeAngle()) {
+                this.targetLocation = desiredTarget;
+                closedLoopController.setReference(desiredTarget, ControlType.kMAXMotionPositionControl);
+                wrist.resume();
+            } else {
+                // wait until wrist tucked before lowering from L4 to L3 or below
+                wrist.tuck();
+            }
+        } else {
+            this.targetLocation = desiredTarget;
+            closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+            wrist.resume();
+        }
+
+        printDashboard();
+    }
+
+    public void printDashboard() {
         SmartDashboard.putNumber("Elevator Position", elevatorMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("Elevator Target", targetLocation);
+        SmartDashboard.putNumber("Elevator Desired Target", desiredTarget);
         SmartDashboard.putBoolean("Elevator Bottom Switch", bottomSwitch.isPressed());
         SmartDashboard.putBoolean("Elevator Top Switch", topSwitch.isPressed());
+    }
+
+    private double getPosition() {  
+        return elevatorMotor.getEncoder().getPosition();
     }
 } 

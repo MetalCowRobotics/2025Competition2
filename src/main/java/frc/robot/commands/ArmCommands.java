@@ -18,33 +18,27 @@ public final class ArmCommands {
 
     // L2 Position Command
     public Command goToL2() {
-        return elevator.goToL2Command()
-            .alongWith(wrist.goToL3Command());
+        return elevator.goToL2Command().alongWith(wrist.goToL3Command());
     }
 
     // L3 Position Command
     public Command goToL3() {
-        return elevator.goToL3Command()
-            .alongWith(wrist.goToL3Command());
+        return elevator.goToL3Command().alongWith(wrist.goToL3Command());
     }
 
     // L4 Position Command
     public Command goToL4() {
-        return elevator.goToL4Command()
-            .alongWith(wrist.goToL4Command());
+        return elevator.goToL4Command().alongWith(wrist.goToL4Command());
     }
 
     // Source Position with Intake Command
     public Command goToSource() {
-        return elevator.goToSourceCommand()
-            .alongWith(wrist.goToSourceCommand())
-            .andThen(intake.startIntakeCommand());
+        return elevator.goToSourceCommand().alongWith(wrist.goToSourceCommand()).andThen(intake.startIntakeCommand());
     }
 
     // Rest Position Command
     public Command goToRest() {
-        return elevator.goToRestCommand()
-            .alongWith(wrist.goToRestCommand());
+        return elevator.goToRestCommand().alongWith(wrist.goToRestCommand());
     }
 
     // Stop All Command

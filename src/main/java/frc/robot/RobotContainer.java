@@ -8,32 +8,22 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
 import frc.robot.constants.AlignmentConstants;
 import frc.robot.commands.AlignToTarget;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Wrist;
-import frc.robot.constants.ElevatorConstants;
 import frc.robot.subsystems.Elevator;
 import frc.robot.commands.ArmCommands;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.commands.LEDAlignmentCommand;
 import frc.robot.commands.LEDDefaultCommand;
 
 public class RobotContainer {
@@ -62,7 +52,7 @@ public class RobotContainer {
 
     private final Intake intake = new Intake();
     private final Wrist wrist = new Wrist();
-    private final Elevator elevator = new Elevator();
+    private final Elevator elevator = new Elevator(wrist);
 
     private final ArmCommands armCommands;
 

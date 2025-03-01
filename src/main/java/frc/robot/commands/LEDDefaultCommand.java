@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import frc.robot.constants.AlignmentConstants;
 
 public class LEDDefaultCommand extends Command {
@@ -36,37 +35,26 @@ public class LEDDefaultCommand extends Command {
         Pose2d nearestTarget = AlignmentConstants.findClosestTarget(currentPose);
         
         if (nearestTarget != null) {
-            double distance = currentPose.getTranslation()
-                .getDistance(nearestTarget.getTranslation());
-            
-            if (distance < proximityThreshold) {
-                // Check both rotation and translation alignment
-                double angleError = Math.abs(nearestTarget.getRotation().minus(currentPose.getRotation()).getDegrees());
+            double distance = currentPose.getTranslation().getDistance(nearestTarget.getTranslation());
+            double angleError = Math.abs(nearestTarget.getRotation().minus(currentPose.getRotation()).getDegrees());
                 
                 // If we're close enough AND properly aligned
                 if (distance < translationThreshold && angleError < rotationThreshold) {
-                    ledSubsystem.setStrobeGreen();  // Red when fully aligned
+                    ledSubsystem.setGreen();  // Red when fully aligned
                     // Activate rumble on both controllers
-                    driverController.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-                    operatorController.getHID().setRumble(RumbleType.kBothRumble, 1.0);
-                } else {
-                    ledSubsystem.setFixedWhite();  // Green when close but not fully aligned
-                    // Stop rumble
                     driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
+                    operatorController.getHID().setRumble(RumbleType.kBothRumble, 1.0);
+                } else if (distance < proximityThreshold) {
+                    ledSubsystem.setWhite();  // Green when close but not fully aligned
+                    // Stop rumble
+                    driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5);
                     operatorController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-                }
-            } else {
-                ledSubsystem.setFixedRed();  // White when not in range
+                } else {
+                ledSubsystem.setRed();  // White when not in range
                 // Stop rumble
                 driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
                 operatorController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-            }
-        } else {
-            ledSubsystem.setFixedRed();  // White when no target found
-            // Stop rumble
-            driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-            operatorController.getHID().setRumble(RumbleType.kBothRumble, 0.0);
-        }
+            }}
     }
 
     @Override
@@ -81,3 +69,5 @@ public class LEDDefaultCommand extends Command {
         return false;
     }
 } 
+
+//TNT
