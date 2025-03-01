@@ -61,11 +61,14 @@ public class AlignToTarget extends Command {
     @Override
     public void initialize() {
         targetPose = targetPoseSupplier.get();
-        xController.setSetpoint(targetPose.getX());
-        yController.setSetpoint(targetPose.getY());
-        rotationController.setSetpoint(targetPose.getRotation().getRadians());
         isRedAlliance = DriverStation.getAlliance().isPresent() && 
                        DriverStation.getAlliance().get() == Alliance.Red;
+        
+        // If on red alliance, invert X and Y coordinates
+      
+            xController.setSetpoint(targetPose.getX());
+            yController.setSetpoint(targetPose.getY());
+        rotationController.setSetpoint(targetPose.getRotation().getRadians());
     }
 
     @Override
@@ -98,15 +101,6 @@ public class AlignToTarget extends Command {
     public void execute() {
         var currentPose = drivetrain.getState().Pose;
         
-        // If on red alliance, adjust the rotation target by 180 degrees
-        if (isRedAlliance) {
-            targetPose = new Pose2d(
-                targetPose.getX(),
-                targetPose.getY(),
-                targetPose.getRotation().plus(Rotation2d.fromDegrees(180))
-            );
-        }
-
         // Calculate distance to target
         double distance = new Translation2d(
             currentPose.getX(), 
@@ -126,6 +120,12 @@ public class AlignToTarget extends Command {
                 currentPose.getRotation().getRadians(),
                 targetPose.getRotation().getRadians()
             );
+
+            // Invert X and Y speeds if on red alliance since we're using field-oriented control
+            if (isRedAlliance) {
+                xSpeed = -xSpeed;
+                ySpeed = -ySpeed;
+            }
 
             // Calculate speed limits based on distance
             double speedScale;
