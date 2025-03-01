@@ -3,6 +3,9 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AlignmentConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -24,6 +27,7 @@ public class AlignToTarget extends Command {
     private static final double MAX_SPEED_NEAR = 3.0; // Increased from 2.0 to 3.0 m/s
     private static final double MAX_ROTATION_SPEED_FAR = 8.0; // Increased from 4.0 to 8.0 rad/s
     private static final double MAX_ROTATION_SPEED_NEAR = 4.0; // Increased from 2.0 to 4.0 rad/s
+    private boolean isRedAlliance;
 
     public AlignToTarget(CommandSwerveDrivetrain drivetrain, Supplier<Pose2d> targetPoseSupplier) {
         this.drivetrain = drivetrain;
@@ -60,6 +64,8 @@ public class AlignToTarget extends Command {
         xController.setSetpoint(targetPose.getX());
         yController.setSetpoint(targetPose.getY());
         rotationController.setSetpoint(targetPose.getRotation().getRadians());
+        isRedAlliance = DriverStation.getAlliance().isPresent() && 
+                       DriverStation.getAlliance().get() == Alliance.Red;
     }
 
     @Override
@@ -92,6 +98,15 @@ public class AlignToTarget extends Command {
     public void execute() {
         var currentPose = drivetrain.getState().Pose;
         
+        // If on red alliance, adjust the rotation target by 180 degrees
+        if (isRedAlliance) {
+            targetPose = new Pose2d(
+                targetPose.getX(),
+                targetPose.getY(),
+                targetPose.getRotation().plus(Rotation2d.fromDegrees(180))
+            );
+        }
+
         // Calculate distance to target
         double distance = new Translation2d(
             currentPose.getX(), 
@@ -105,10 +120,11 @@ public class AlignToTarget extends Command {
 
         // Only run alignment if we're within activation distance
         if (distance <= ACTIVATION_DISTANCE_METERS) {
-            double xSpeed = xController.calculate(currentPose.getX());
-            double ySpeed = yController.calculate(currentPose.getY());
+            double xSpeed = xController.calculate(currentPose.getX(), targetPose.getX());
+            double ySpeed = yController.calculate(currentPose.getY(), targetPose.getY());
             double rotationSpeed = rotationController.calculate(
-                currentPose.getRotation().getRadians()
+                currentPose.getRotation().getRadians(),
+                targetPose.getRotation().getRadians()
             );
 
             // Calculate speed limits based on distance

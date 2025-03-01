@@ -25,6 +25,7 @@ import frc.robot.commands.ArmCommands;
 import com.pathplanner.lib.auto.NamedCommands;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.commands.LEDDefaultCommand;
+import frc.robot.subsystems.Climb;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -57,6 +58,8 @@ public class RobotContainer {
     private final ArmCommands armCommands;
 
     private final LEDSubsystem ledSubsystem = new LEDSubsystem(0);
+
+    private final Climb climb = new Climb();
 
     public RobotContainer() {
         // Create vision subsystem after drivetrain
@@ -102,8 +105,6 @@ public class RobotContainer {
             )
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-
         
         // X button for left side targets with LED feedback
         joystick.x().whileTrue(
@@ -144,6 +145,10 @@ public class RobotContainer {
         );
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        // Climb controls
+        joystick.a().whileTrue(climb.runUntilLimitCommand());
+        joystick.y().onTrue(climb.climbAdditionalCommand());
     }
 
     public Command getAutonomousCommand() {
