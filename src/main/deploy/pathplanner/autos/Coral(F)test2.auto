@@ -30,6 +30,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -52,13 +58,19 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Go To L4"
+                        "name": "Go To Source"
                       }
                     }
                   ]
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Intake"
           }
         },
         {
@@ -78,7 +90,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.8
+                        "waitTime": 0.2
                       }
                     },
                     {
@@ -91,6 +103,18 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Reverse Intake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
@@ -126,6 +150,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Stop Intake"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -142,7 +172,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.8
+                        "waitTime": 0.2
                       }
                     },
                     {
@@ -155,6 +185,18 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Reverse Intake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         }
       ]

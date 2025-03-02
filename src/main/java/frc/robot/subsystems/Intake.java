@@ -25,11 +25,8 @@ public class Intake extends SubsystemBase {
     }
 
     public Command startIntakeCommand() {
-        return this.startEnd(
-            // When the command starts, run the intake
-            () -> intakeMotor.set(INTAKE_SPEED),
-            // When the command ends, stop the intake
-            () -> intakeMotor.set(0)
+        return this.runOnce(
+            () -> intakeMotor.set(INTAKE_SPEED)
         );
     }
 
