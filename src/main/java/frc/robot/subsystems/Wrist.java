@@ -41,23 +41,28 @@ public class Wrist extends SubsystemBase {
              .smartCurrentLimit(50)
              .voltageCompensation(12);
 
+        // Enable soft limits
+        config.softLimit
+           .forwardSoftLimit(0.75);
+
         config.closedLoop
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) // Change to use absolute encoder
-            .p(0.1) // You may need to retune these PID values
-            .d(0.08)
-            .i(0.00006)
-            .iZone(0.01)
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+            .p(0.1)
+            .d(0.09)
+            .i(0.06)
+            .iZone(0.05)
             .outputRange(-0.3, 0.3)
             .maxMotion
             .maxVelocity(4200)
             .maxAcceleration(4000)
-            .allowedClosedLoopError(.01);
+            .allowedClosedLoopError(.02);
 
         wristMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public void setTargetLocation(double targetLocation) {
-        this.desiredLocation = targetLocation;
+        // Constrain target location between 0 and 0.75
+        this.desiredLocation = Math.min(Math.max(targetLocation, 0), 0.75);
     }
 
     public void tuck() {
@@ -98,6 +103,7 @@ public class Wrist extends SubsystemBase {
         SmartDashboard.putNumber("Wrist/Desired Location", desiredLocation);
         SmartDashboard.putBoolean("Wrist/Is Safe Position", isInSafePosition);
         SmartDashboard.putNumber("Wrist/Safe Angle Threshold", SAFE_ANGLE);
+        SmartDashboard.putNumber("Wrist/Forward Limit", 0.75);
         
         // Motor information
         SmartDashboard.putNumber("Wrist/Motor Output", wristMotor.getAppliedOutput());

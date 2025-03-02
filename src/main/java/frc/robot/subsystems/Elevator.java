@@ -37,7 +37,7 @@ public class Elevator extends SubsystemBase {
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(true);
         config.idleMode(IdleMode.kCoast)
-             .smartCurrentLimit(50)
+             .smartCurrentLimit(80)
              .voltageCompensation(12);
 
         config.limitSwitch
@@ -48,11 +48,11 @@ public class Elevator extends SubsystemBase {
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(1)
-            .d(0.015)
-            .i(0.004)
-            .iZone(0.7)
-            .outputRange(-0.9, 0.8)
+            .p(3)
+            .d(0.005)
+            .i(0.0004)
+            .iZone(0.09)
+            .outputRange(-1, 1)
             .maxMotion
             .maxVelocity(6000)
             .maxAcceleration(4000)
