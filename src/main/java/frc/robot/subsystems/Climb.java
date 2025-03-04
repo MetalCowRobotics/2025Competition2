@@ -23,7 +23,7 @@ public class Climb extends SubsystemBase {
     private double targetPosition = 0;
     private static final int MOTOR_ID = 18;
     private static final double CLIMB_SPEED = 1; // 30% speed
-    private static final double ADDITIONAL_ROTATIONS = 330;
+    private static final double ADDITIONAL_ROTATIONS = 217.5;
 
     public Climb() {
         climbMotor = new SparkMax(MOTOR_ID, MotorType.kBrushless);
