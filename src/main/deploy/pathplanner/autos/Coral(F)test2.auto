@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ToCoralF"
+                  "pathName": "1"
                 }
               },
               {
@@ -32,7 +32,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0.25
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2"
           }
         },
         {
@@ -42,7 +48,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralFToSource"
+                  "pathName": "3"
                 }
               },
               {
@@ -52,7 +58,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.8
+                        "waitTime": 0.4
                       }
                     },
                     {
@@ -71,6 +77,18 @@
           "type": "named",
           "data": {
             "name": "Stop Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "source to d1"
           }
         },
         {
@@ -114,7 +132,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0.25
           }
         },
         {
@@ -124,7 +142,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CToSource"
+                  "pathName": "DToSource"
                 }
               },
               {
@@ -134,7 +152,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.8
+                        "waitTime": 0.4
                       }
                     },
                     {
@@ -150,9 +168,21 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "DtoSource2"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Stop Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sourcetoc1"
           }
         },
         {
@@ -196,7 +226,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 0.25
           }
         }
       ]

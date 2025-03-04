@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ElevatorConstants;
 
+
 public class Elevator extends SubsystemBase {
     private final SparkMax elevatorMotor;
+    private final SparkMax elevatorFollowerMotor;
     private final SparkClosedLoopController closedLoopController;
     private final SparkLimitSwitch bottomSwitch;
     private final SparkLimitSwitch topSwitch;
@@ -30,14 +32,17 @@ public class Elevator extends SubsystemBase {
     public Elevator(Wrist wrist) {
         this.wrist = wrist;
         elevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
+        elevatorFollowerMotor = new SparkMax(ElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_ID, MotorType.kBrushless);
+        
         closedLoopController = elevatorMotor.getClosedLoopController();
         bottomSwitch = elevatorMotor.getReverseLimitSwitch();
         topSwitch = elevatorMotor.getForwardLimitSwitch();
 
+        // Configure the main elevator motor
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true);
-        config.idleMode(IdleMode.kCoast)
-             .smartCurrentLimit(80)
+        config.inverted(true);  // Main motor is inverted
+        config.idleMode(IdleMode.kBrake)
+             .smartCurrentLimit(40)
              .voltageCompensation(12);
 
         config.limitSwitch
@@ -48,17 +53,41 @@ public class Elevator extends SubsystemBase {
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(3)
-            .d(0.005)
-            .i(0.0004)
-            .iZone(0.09)
+            .p(1)
+            // .d(0.001)
+            .i(0.0001)
+            // .iZone(4)
             .outputRange(-1, 1)
             .maxMotion
             .maxVelocity(6000)
-            .maxAcceleration(4000)
-            .allowedClosedLoopError(0.25);
+            .maxAcceleration(5000)
+            .allowedClosedLoopError(0.5);
 
         elevatorMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        // Configure the follower motor
+        SparkMaxConfig followerConfig = new SparkMaxConfig();
+        followerConfig.inverted(false); 
+        followerConfig.follow(15, true); // Changed to false since main motor is inverted
+        followerConfig.idleMode(IdleMode.kCoast)
+                     .smartCurrentLimit(40)
+                     .voltageCompensation(12);
+        elevatorFollowerMotor.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        followerConfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .p(1)
+            // .d(0.001)
+            .i(0.0001)
+            // .iZone(4)
+            .outputRange(-1, 1)
+            .maxMotion
+            .maxVelocity(6000)
+            .maxAcceleration(5000)
+            .allowedClosedLoopError(0.5);
+        
+        // Set follower motor to follow the main motor in opposite direction
+        elevatorFollowerMotor.isFollower(); // true inverts the following direction
+       
         zeroEncoder();
     }
 
@@ -123,6 +152,9 @@ public class Elevator extends SubsystemBase {
         }
 
         printDashboard();
+
+        SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
     }
 
     public void printDashboard() {
