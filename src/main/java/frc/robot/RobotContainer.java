@@ -78,6 +78,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Start Intake", intake.startIntakeCommand());
         NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
         NamedCommands.registerCommand("Reverse Intake", intake.reverseIntakeCommand());
+        NamedCommands.registerCommand("Stall Intake", intake.stallIntakeCommand());
         
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
