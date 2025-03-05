@@ -37,7 +37,7 @@ public class Wrist extends SubsystemBase {
         
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(true);
-        config.idleMode(IdleMode.kCoast)
+        config.idleMode(IdleMode.kBrake)
              .smartCurrentLimit(50)
              .voltageCompensation(12);
 
@@ -49,7 +49,7 @@ public class Wrist extends SubsystemBase {
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
             .p(0.1)
             .d(0.09)
-            .i(0.06)
+            .i(0.04)
             .iZone(0.05)
             .outputRange(-0.3, 0.3)
             .maxMotion
@@ -89,6 +89,10 @@ public class Wrist extends SubsystemBase {
 
     public Command goToRestCommand() {
         return this.runOnce(() -> setTargetLocation(WristConstants.Rest_Angle));
+    }
+
+    public Command goForwardCommand() {
+        return this.runOnce(() -> setTargetLocation(WristConstants.Forward_Angle));
     }
 
     @Override

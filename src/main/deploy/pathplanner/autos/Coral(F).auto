@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ToCoralI"
+                  "pathName": "ToCoralF"
                 }
               },
               {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralIToSource"
+                  "pathName": "CoralFToSource"
                 }
               },
               {
@@ -95,7 +95,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": " Right",
   "choreoAuto": false
 }

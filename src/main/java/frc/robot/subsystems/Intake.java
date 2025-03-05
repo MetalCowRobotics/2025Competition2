@@ -16,7 +16,7 @@ public class Intake extends SubsystemBase {
     private static final int INTAKE_MOTOR_ID = 17; // Adjust this ID as needed
     private static final double INTAKE_SPEED = 0.7; // 70% speed for intake
     private static final double REVERSE_SPEED = -0.9; // 70% speed for outtake
-    private static final double STALL_SPEED = 0.05;
+    private static final double STALL_SPEED = 0.1;
 
     public Intake() {
         intakeMotor = new SparkMax(INTAKE_MOTOR_ID, MotorType.kBrushed);

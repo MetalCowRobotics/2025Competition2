@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ToCoralI"
+                  "pathName": "ToCoralF"
                 }
               },
               {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralIToSource"
+                  "pathName": "CoralFToSource"
                 }
               },
               {
@@ -99,7 +99,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "SourceToCoralK"
+                  "pathName": "SourceToCoralD"
                 }
               },
               {
@@ -149,7 +149,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralKToSource"
+                  "pathName": "CoralDToSource"
                 }
               },
               {
@@ -187,7 +187,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "SourceToCoralL"
+                  "pathName": "SourceToCoralC"
                 }
               },
               {
@@ -233,7 +233,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": " Right",
   "choreoAuto": false
 }
