@@ -31,6 +31,16 @@ public final class ArmCommands {
         return elevator.goToL4Command().alongWith(wrist.goToL4Command());
     }
 
+    // Alage Position Commands
+    
+    public Command goToAlgaeL3() {
+        return elevator.goToAlgaeL3Command().alongWith(wrist.goToAlage()).andThen(intake.slowReverseIntakeCommand());
+    }
+
+    public Command goToAlgaeL2() {
+        return elevator.goToAlgaeL2Command().alongWith(wrist.goToAlage()).andThen(intake.slowReverseIntakeCommand());
+    }
+
     // Source Position with Intake Command
     public Command goToSource() {
         return elevator.goToSourceCommand().alongWith(wrist.goToSourceCommand()).andThen(intake.startIntakeCommand());

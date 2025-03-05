@@ -5,6 +5,9 @@ public final class ElevatorConstants {
     public static final double L2_Distance = 11.4;
     public static final double L3_Distance = 24;
     public static final double L4_Distance = 44.1;
+    public static final double AlgaeL3_Distance = 19
+    ;
+    public static final double AlgaeL2_Distance = 9;
     public static final double resetPos = 0;
 
     // Motor configuration

@@ -95,6 +95,10 @@ public class Wrist extends SubsystemBase {
         return this.runOnce(() -> setTargetLocation(WristConstants.Forward_Angle));
     }
 
+    public Command goToAlage(){
+        return this.runOnce(() -> setTargetLocation(WristConstants.Alage_Angle));
+    }
+
     @Override
     public void periodic() {
         // Update safety status

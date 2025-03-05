@@ -17,6 +17,7 @@ public class Intake extends SubsystemBase {
     private static final double INTAKE_SPEED = 0.7; // 70% speed for intake
     private static final double REVERSE_SPEED = -0.9; // 70% speed for outtake
     private static final double STALL_SPEED = 0.1;
+    private static final double SLOW_REVERSE_SPEED = -0.5;
 
     public Intake() {
         intakeMotor = new SparkMax(INTAKE_MOTOR_ID, MotorType.kBrushed);
@@ -39,6 +40,12 @@ public class Intake extends SubsystemBase {
     public Command reverseIntakeCommand() {
         return this.runOnce(
             () -> intakeMotor.set(REVERSE_SPEED)
+        );
+    }
+
+    public Command slowReverseIntakeCommand() {
+        return this.runOnce(
+            () -> intakeMotor.set(SLOW_REVERSE_SPEED)
         );
     }
 

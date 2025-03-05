@@ -103,6 +103,15 @@ public class Elevator extends SubsystemBase {
         return this.runOnce(() -> setTargetLocation(ElevatorConstants.L4_Distance));
     }
 
+    public Command goToAlgaeL3Command() {
+        return this.runOnce(() -> setTargetLocation(ElevatorConstants.AlgaeL3_Distance));
+    }
+
+    
+    public Command goToAlgaeL2Command() {
+        return this.runOnce(() -> setTargetLocation(ElevatorConstants.AlgaeL2_Distance));
+    }
+
     public Command goToL3Command() {
         return this.runOnce(() -> setTargetLocation(ElevatorConstants.L3_Distance));
     }
