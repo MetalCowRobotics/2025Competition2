@@ -135,7 +135,10 @@ public class RobotContainer {
         operatorController.b().onTrue(armCommands.goToL3());     // L3 position on B
         operatorController.y().onTrue(armCommands.goToL4());     // L4 position on Y
         operatorController.x().onTrue(armCommands.goToSource()); // Source position + intake on X
-        joystick.leftBumper().onTrue(armCommands.goToRest());   // Rest position on driver left bumper
+        joystick.leftBumper().onTrue(armCommands.goToRest());
+        operatorController.rightTrigger().onTrue(armCommands.goToAlgaeL2());
+        operatorController.leftTrigger().onTrue(armCommands.goToAlgaeL3());
+        // Rest position on driver left bumper
 
         // Stop intake
         operatorController.leftBumper().onTrue(intake.reverseIntakeCommand());
@@ -149,7 +152,10 @@ public class RobotContainer {
 
         // Climb controls
         joystick.a().whileTrue(climb.runUntilLimitCommand());
+        joystick.a().onTrue(wrist.goForwardCommand()); // flip wrist out when ready to climb
         joystick.y().onTrue(climb.climbAdditionalCommand());
+
+        
     }
 
     public Command getAutonomousCommand() {
