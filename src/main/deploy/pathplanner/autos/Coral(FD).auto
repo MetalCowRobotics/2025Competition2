@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Wrist Out"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -90,6 +96,12 @@
           "type": "named",
           "data": {
             "name": "Stop Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wrist Out"
           }
         },
         {
@@ -183,7 +195,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": " Right",
   "choreoAuto": false
 }

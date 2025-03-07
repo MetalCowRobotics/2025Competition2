@@ -90,11 +90,19 @@ public class Elevator extends SubsystemBase {
         zeroEncoder();
     }
 
+    public Command setUp() {
+        return this.run(() -> elevatorMotor.set(0.2));
+    }
+
+    public Command setDown() {
+        return this.run(() -> elevatorMotor.set(-0.2));
+    }
+
     public void setTargetLocation(double targetLocation) {
         this.desiredTarget = targetLocation;
     }
 
-    private void zeroEncoder() {
+    public void zeroEncoder() {
         elevatorMotor.getEncoder().setPosition(0);
     }
 
@@ -174,7 +182,7 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putBoolean("Elevator Top Switch", topSwitch.isPressed());
     }
 
-    private double getPosition() {  
+    public double getPosition() {  
         return elevatorMotor.getEncoder().getPosition();
     }
 } 

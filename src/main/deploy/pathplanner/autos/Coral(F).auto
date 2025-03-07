@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Wrist Out"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [

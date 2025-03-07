@@ -50,27 +50,29 @@ public class Climb extends SubsystemBase {
         climbMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    public Command runUntilLimitCommand() {
+    public Command runClimb() {
         return this.startEnd(
             // When command starts
             () -> climbMotor.set(CLIMB_SPEED),
             // When command ends
             () -> {
                 climbMotor.set(0);
-                if (!limitSwitch.get()) {
-                    zeroEncoder();
-                }
+
             }
-        ).until(() -> !limitSwitch.get());
+        );
     }
 
-    public Command climbAdditionalCommand() {
+    // public Command runClimb(){
+    //     return this.runOnce(() -> {climbMOtor.set(CLIMB_SPEED)})
+    // }
 
-        return this.runOnce(() -> {
-            targetPosition = ADDITIONAL_ROTATIONS;
-            closedLoopController.setReference(targetPosition, ControlType.kMAXMotionPositionControl);
-        });
-    }
+    // public Command climbAdditionalCommand() {
+
+    //     return this.runOnce(() -> {
+    //         targetPosition = ADDITIONAL_ROTATIONS;
+    //         closedLoopController.setReference(targetPosition, ControlType.kMAXMotionPositionControl);
+    //     });
+    // }
 
     private void zeroEncoder() {
         climbMotor.getEncoder().setPosition(0);

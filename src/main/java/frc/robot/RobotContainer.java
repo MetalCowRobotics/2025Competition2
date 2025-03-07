@@ -79,7 +79,11 @@ public class RobotContainer {
         NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
         NamedCommands.registerCommand("Reverse Intake", intake.reverseIntakeCommand());
         NamedCommands.registerCommand("Stall Intake", intake.stallIntakeCommand());
-        
+        NamedCommands.registerCommand("Wrist Out", wrist.goForwardCommand());
+        NamedCommands.registerCommand("L3 Alage Remove", armCommands.goToAlgaeL3());
+        NamedCommands.registerCommand("L2 Alage Remove", armCommands.goToAlgaeL2());
+                
+
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -150,10 +154,33 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
+
+        // Manual Control on Elevator
+        // if(operatorController.getLeftY()>0.1){
+        //     elevator.setUp();
+        // }
+
+        // if(operatorController.getLeftY()<-0.1){
+        //     elevator.setDown();
+        // }
+        
+        // if(operatorController.start().getAsBoolean()){
+        //     elevator.zeroEncoder();
+        // }
+
+        // while(operatorController.start().getAsBoolean()){
+  
+        // }
+
+        // Manual Control for Intake 
+
+        operatorController.start().whileTrue(intake.manualStallCommand());
+
+        
         // Climb controls
-        joystick.a().whileTrue(climb.runUntilLimitCommand());
-        joystick.a().onTrue(wrist.goForwardCommand()); // flip wrist out when ready to climb
-        joystick.y().onTrue(climb.climbAdditionalCommand());
+        joystick.a().whileTrue(climb.runClimb());
+        // joystick.a().onTrue(wrist.goForwardCommand()); // flip wrist out when ready to climb
+        // joystick.y().onTrue(climb.climbAdditionalCommand());
 
         
     }

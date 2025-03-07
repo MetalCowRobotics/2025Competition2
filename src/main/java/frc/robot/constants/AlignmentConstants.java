@@ -29,14 +29,23 @@ public final class AlignmentConstants {
         new Pose2d(13.89, 5.06, Rotation2d.fromDegrees(-120)), // RC
         new Pose2d(12.504, 5.22, Rotation2d.fromDegrees(-60)),// RE
         new Pose2d(11.673, 4.196, Rotation2d.fromDegrees(0)),//RG
-        new Pose2d(12.32, 3.4, Rotation2d.fromDegrees(60)),//RI
-        new Pose2d(13.54, 2.87, Rotation2d.fromDegrees(120)),//RK
+    new Pose2d(13.58,2.78, Rotation2d.fromDegrees(120)),//RK
+    new Pose2d(12.27,2.95, Rotation2d.fromDegrees(60)),//RI
         new Pose2d(14.37, 3.89, Rotation2d.fromDegrees(180)),//RA
         new Pose2d(16.39, 1.03, Rotation2d.fromDegrees(-60)),//RA
+        new Pose2d(1.486, 0.620, Rotation2d.fromDegrees(-126)),//RightSourceLeft(BLUE)
+        new Pose2d(0.611, 6.758, Rotation2d.fromDegrees(126)),//LeftSourceLeft(BLUE)
+        new Pose2d(16.028, 7.411, Rotation2d.fromDegrees(54)),//LeftSourceLeft(RED)
+        new Pose2d(16.903, 1.244, Rotation2d.fromDegrees(-54)),//LeftSourceLeft(RED)
+        
+        
         // new Pose2d(1.166, 7.057, Rotation2d.fromDegrees(0)),
         // new Pose2d(16.44, 7.009, Rotation2d.fromDegrees(0)),
         // new Pose2d(16.44, 1.010, Rotation2d.fromDegrees(0))
     };
+
+
+
 
     // Right Side Positions
     public static final Pose2d[] RIGHT_POSITIONS = {
@@ -50,14 +59,22 @@ public final class AlignmentConstants {
         new Pose2d(13.574, 5.307, Rotation2d.fromDegrees(-120)),//RD
         new Pose2d(12.23, 5.02, Rotation2d.fromDegrees(-60)),//RF
         new Pose2d(11.682, 3.867, Rotation2d.fromDegrees(0)),//RH
-        new Pose2d(12.54, 2.84, Rotation2d.fromDegrees(60)),//RJ
-        new Pose2d(13.83, 2.98, Rotation2d.fromDegrees(120)),//Rl
+   new Pose2d(13.89,2.97,Rotation2d.fromDegrees(120)),//RL
+    new Pose2d(12.52,2.79,Rotation2d.fromDegrees(60)),//RJ
         new Pose2d(14.35, 4.2, Rotation2d.fromDegrees(180)),//RB
+        new Pose2d(0.683, 1.22, Rotation2d.fromDegrees(-126)),//RightSourceRight(BLUE)
+        new Pose2d(1.486, 7.394, Rotation2d.fromDegrees(126)),//LeftSourceRight(BLUE)
+        new Pose2d(16.891, 6.806, Rotation2d.fromDegrees(54)),//LeftSourceLeft(RED)
+        new Pose2d(16.171, 0.692, Rotation2d.fromDegrees(-54)),//LeftSourceLeft(RED)
+        
+        
         // new Pose2d(13.809, 2.985, Rotation2d.fromDegrees(0)),
         // new Pose2d(1.198, 7.013, Rotation2d.fromDegrees(135)),
         // new Pose2d(16.382, 7.009, Rotation2d.fromDegrees(0)),
         // new Pose2d(16.470, 1.096, Rotation2d.fromDegrees(0))
     };
+
+ 
 
     // Method to find closest target
     public static Pose2d findClosestLeftTarget(Pose2d currentPose) {

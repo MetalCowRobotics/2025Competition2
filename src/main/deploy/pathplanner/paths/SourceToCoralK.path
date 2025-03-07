@@ -3,38 +3,43 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.6423155737704918,
-        "y": 7.285655737704918
+        "x": 1.5584016393442621,
+        "y": 7.441495901639343
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.469157117456989,
-        "y": 5.74796301995229
+        "x": 2.2776639344262293,
+        "y": 6.218749999999999
       },
       "isLocked": false,
       "linkedName": "Source"
     },
     {
       "anchor": {
-        "x": 4.00389344262295,
-        "y": 5.163831967213114
+        "x": 3.9679303278688525,
+        "y": 5.199795081967213
       },
       "prevControl": {
-        "x": 3.413052395125372,
-        "y": 6.247622553390189
+        "x": 3.620286885245902,
+        "y": 5.751229508196722
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "CoralK"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5586353944562863,
+      "rotationDegrees": -59.99999999999999
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 1.2,
+    "maxVelocity": 1.7,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -50,5 +55,5 @@
     "velocity": 0,
     "rotation": 126.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

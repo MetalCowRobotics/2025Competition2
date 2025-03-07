@@ -1,15 +1,21 @@
 package frc.robot.subsystems;
 
 import frc.robot.Robot;
+
+import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 public class Intake extends SubsystemBase {
     private final SparkMax intakeMotor;
@@ -18,12 +24,19 @@ public class Intake extends SubsystemBase {
     private static final double REVERSE_SPEED = -0.9; // 70% speed for outtake
     private static final double STALL_SPEED = 0.1;
     private static final double SLOW_REVERSE_SPEED = -0.5;
+    public static SparkLimitSwitch limitSwitch;
+    public         SparkMaxConfig config;
 
     public Intake() {
         intakeMotor = new SparkMax(INTAKE_MOTOR_ID, MotorType.kBrushed);
         
         // Configure the motor
-        SparkMaxConfig config = new SparkMaxConfig();
+        limitSwitch = intakeMotor.getForwardLimitSwitch();
+        config = new SparkMaxConfig();
+        config.limitSwitch.forwardLimitSwitchEnabled(false);
+
+        intakeMotor.configure(config, null, null);
+
     }
 
     public Command startIntakeCommand() {
@@ -32,6 +45,12 @@ public class Intake extends SubsystemBase {
         );
     }
     public Command stallIntakeCommand() {
+        return this.runOnce(
+            () -> intakeMotor.set(STALL_SPEED));
+        
+    }
+
+        public Command manualStallCommand() {
         return this.runOnce(
             () -> intakeMotor.set(STALL_SPEED));
         
@@ -58,6 +77,13 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+
+        if(Intake.limitSwitch.isPressed()){
+
+            this.runOnce(() -> manualStallCommand());
+
+        }
+
     }
 
     public void stop() {
