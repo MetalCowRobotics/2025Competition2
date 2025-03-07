@@ -33,11 +33,11 @@ public final class AlignmentConstants {
     new Pose2d(12.27,2.95, Rotation2d.fromDegrees(60)),//RI
         new Pose2d(14.37, 3.89, Rotation2d.fromDegrees(180)),//RA
         new Pose2d(16.39, 1.03, Rotation2d.fromDegrees(-60)),//RA
-        new Pose2d(1.486, 0.620, Rotation2d.fromDegrees(-126)),//RightSourceLeft(BLUE)
-        new Pose2d(0.611, 6.758, Rotation2d.fromDegrees(126)),//LeftSourceLeft(BLUE)
-        new Pose2d(16.028, 7.411, Rotation2d.fromDegrees(54)),//LeftSourceLeft(RED)
-        new Pose2d(16.903, 1.244, Rotation2d.fromDegrees(-54)),//LeftSourceLeft(RED)
-        
+        // new Pose2d(1.486, 0.620, Rotation2d.fromDegrees(-126)),//RightSourceLeft(BLUE)
+        // new Pose2d(0.611, 6.758, Rotation2d.fromDegrees(126)),//LeftSourceLeft(BLUE)
+        // new Pose2d(16.028, 7.411, Rotation2d.fromDegrees(54)),//LeftSourceLeft(RED)
+        // new Pose2d(16.903, 1.244, Rotation2d.fromDegrees(-54)),//LeftSourceLeft(RED)
+        new Pose2d(16.817, 0.98, Rotation2d.fromDegrees(-57)),//LeftSourceLeft(BLUE)
         
         // new Pose2d(1.166, 7.057, Rotation2d.fromDegrees(0)),
         // new Pose2d(16.44, 7.009, Rotation2d.fromDegrees(0)),
@@ -62,11 +62,13 @@ public final class AlignmentConstants {
    new Pose2d(13.89,2.97,Rotation2d.fromDegrees(120)),//RL
     new Pose2d(12.52,2.79,Rotation2d.fromDegrees(60)),//RJ
         new Pose2d(14.35, 4.2, Rotation2d.fromDegrees(180)),//RB
-        new Pose2d(0.683, 1.22, Rotation2d.fromDegrees(-126)),//RightSourceRight(BLUE)
-        new Pose2d(1.486, 7.394, Rotation2d.fromDegrees(126)),//LeftSourceRight(BLUE)
-        new Pose2d(16.891, 6.806, Rotation2d.fromDegrees(54)),//LeftSourceLeft(RED)
-        new Pose2d(16.171, 0.692, Rotation2d.fromDegrees(-54)),//LeftSourceLeft(RED)
-        
+        // new Pose2d(0.683, 1.22, Rotation2d.fromDegrees(-126)),//RightSourceRight(BLUE)
+        // new Pose2d(1.486, 7.394, Rotation2d.fromDegrees(126)),//LeftSourceRight(BLUE)
+        // new Pose2d(16.891, 6.806, Rotation2d.fromDegrees(54)),//LeftSourceLeft(RED)
+        // new Pose2d(16.171, 0.692, Rotation2d.fromDegrees(-54)),//RightSourceLeft(RED)
+
+        new Pose2d(16.11, 0.63, Rotation2d.fromDegrees(-54)),//LeftSourceLeft(BLUE)
+       
         
         // new Pose2d(13.809, 2.985, Rotation2d.fromDegrees(0)),
         // new Pose2d(1.198, 7.013, Rotation2d.fromDegrees(135)),

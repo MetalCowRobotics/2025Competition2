@@ -103,6 +103,12 @@
           "data": {
             "pathName": "HAlageToRemove"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "New Path"
+          }
         }
       ]
     }

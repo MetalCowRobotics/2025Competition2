@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Stall Intake"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -95,7 +101,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Stop Intake"
+            "name": "Stall Intake"
           }
         },
         {

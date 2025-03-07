@@ -82,7 +82,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Wrist Out", wrist.goForwardCommand());
         NamedCommands.registerCommand("L3 Alage Remove", armCommands.goToAlgaeL3());
         NamedCommands.registerCommand("L2 Alage Remove", armCommands.goToAlgaeL2());
-                
+        NamedCommands.registerCommand("Intake Hold", intake.startIntakeCommand());
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -149,7 +149,7 @@ public class RobotContainer {
         
         // Reverse intake - toggle style
         operatorController.rightBumper().onTrue(
-                intake.stopIntakeCommand()
+                intake.stallIntakeCommand()
         );
 
         drivetrain.registerTelemetry(logger::telemeterize);

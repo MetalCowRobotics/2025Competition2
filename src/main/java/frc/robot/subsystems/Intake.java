@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
     private static final int INTAKE_MOTOR_ID = 17; // Adjust this ID as needed
     private static final double INTAKE_SPEED = 0.7; // 70% speed for intake
     private static final double REVERSE_SPEED = -0.9; // 70% speed for outtake
-    private static final double STALL_SPEED = 0.1;
+    private static final double STALL_SPEED = 0.35;
     private static final double SLOW_REVERSE_SPEED = -0.5;
     public static SparkLimitSwitch limitSwitch;
     public         SparkMaxConfig config;
@@ -77,13 +77,6 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-
-        if(Intake.limitSwitch.isPressed()){
-
-            this.runOnce(() -> manualStallCommand());
-
-        }
-
     }
 
     public void stop() {

@@ -25,7 +25,7 @@ public class Wrist extends SubsystemBase {
     private final SparkAbsoluteEncoder absoluteEncoder;
     private double targetLocation = 0;
     private double desiredLocation = 0;
-    private final double SAFE_ANGLE = 0.4;
+    private final double SAFE_ANGLE = 0.35;
     private boolean isInSafePosition = false;
 
     public Wrist() {
@@ -47,7 +47,7 @@ public class Wrist extends SubsystemBase {
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            .p(0.1)
+            .p(0.13)
             .d(0.09)
             .i(0.04)
             .iZone(0.05)
