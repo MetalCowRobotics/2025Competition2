@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.730122950819672,
-        "y": 3.97
+        "x": 1.5584016393442621,
+        "y": 7.441495901639343
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.001738466702153,
-        "y": 3.939984378773848
+        "x": 1.7974167570695134,
+        "y": 7.5147882852735535
       },
       "isLocked": false,
-      "linkedName": "AlageRemove"
+      "linkedName": "Source"
     },
     {
       "anchor": {
-        "x": 6.245594262295082,
-        "y": 4.025
+        "x": 3.2,
+        "y": 4.18
       },
       "prevControl": {
-        "x": 5.995838872934667,
-        "y": 4.036056468035822
+        "x": 2.9518889417281136,
+        "y": 4.14932586165506
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.2,
-    "maxAcceleration": 0.1,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 1.2,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 146.68936917543914
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Right",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 126.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
