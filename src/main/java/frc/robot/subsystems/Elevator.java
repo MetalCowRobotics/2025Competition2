@@ -136,36 +136,37 @@ public class Elevator extends SubsystemBase {
         return this.runOnce(() -> setTargetLocation(ElevatorConstants.resetPos));
     }
 
+    public void elevatorMoveToDesired(){
+        closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+    }
+
     @Override
     public void periodic() {
-        // If elevator is at or below L3 but wanting to go to L4, make sure wrist is tucked in
-        // If elevator is at L4 but wanting to go below L4, wait until wrist is tucked in
-        boolean atOrBelowL3 = (getPosition() - ElevatorConstants.L3_Distance) < 3.0;
-
-        if (desiredTarget > ElevatorConstants.L3_Distance && getPosition() > ElevatorConstants.L2_Distance) {
-            // For positions above L3, require safe wrist angle
-            if (wrist.isAtSafeAngle()) {
-                this.targetLocation = desiredTarget;
-                closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
-                wrist.resume();
+        // If elevator is below L2 and desired target is below L2, move both together
+        if (getPosition() <= ElevatorConstants.L2_Distance && desiredTarget <= ElevatorConstants.L2_Distance) {
+            wrist.resume();  // Wrist can move as desired
+            elevatorMoveToDesired();  // Elevator can move to its target location
+        }
+        
+        // If the elevator is below L2 and we want to go above L2, make sure the wrist is at target first
+        else if (getPosition() <= ElevatorConstants.L2_Distance && desiredTarget > ElevatorConstants.L2_Distance) {
+            if (wrist.isAtTarget()) {
+                // Wrist is at its target, so now move the elevator
+                elevatorMoveToDesired();
             } else {
-                // wanting to go above L3 but wrist is out so wait for next periodic
-                wrist.tuck();
+                // Wait until wrist is at target, don't move the elevator
+                wrist.resume();
             }
-        } else if (desiredTarget < ElevatorConstants.L4_Distance && getPosition() >= 35) {
-            wrist.tuck();
-            this.targetLocation = desiredTarget;
-            closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
-        } else {
-            wrist.resume();
-            // For positions at or below L3, allow movement regardless of wrist angle
-            this.targetLocation = desiredTarget;
-            closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+        }
 
-            // if(getPosition() < ElevatorConstants.L3_Distance){
-            //     wrist.resume();
-            // }
-
+        // If the elevator is above L2, we need to wait until it's below or at L2 before moving the wrist
+        else if (getPosition() > ElevatorConstants.L2_Distance) {
+            if (getPosition() <= ElevatorConstants.L2_Distance) {
+                wrist.resume();  // Now wrist can start moving as elevator reaches L2
+            } else {
+                wrist.holdLastTarget();  // Keep wrist moving as needed
+                elevatorMoveToDesired();  // Elevator continues moving until it reaches below or at L2
+            }
         }
 
         printDashboard();
@@ -173,6 +174,63 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
         SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
     }
+
+
+    // @Override
+    // public void periodic() {
+        // // If elevator is at or below L3 but wanting to go to L4, make sure wrist is tucked in
+        // // If elevator is at L4 but wanting to go below L4, wait until wrist is tucked in
+        // boolean atOrBelowL3 = (getPosition() - ElevatorConstants.L3_Distance) < 3.0;
+
+        // if (desiredTarget > ElevatorConstants.L3_Distance && getPosition() > ElevatorConstants.L2_Distance) {
+        //     // For positions above L3, require safe wrist angle
+        //     if (wrist.isAtSafeAngle()) {
+        //         this.targetLocation = desiredTarget;
+        //         closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+        //         wrist.resume();
+        //     } else {
+        //         // wanting to go above L3 but wrist is out so wait for next periodic
+        //         wrist.tuck();
+        //     }
+        // } else if (desiredTarget < ElevatorConstants.L4_Distance && getPosition() >= 35) {
+        //     wrist.tuck();
+        //     this.targetLocation = desiredTarget;
+        //     closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+        // } else {
+        //     wrist.resume();
+        //     // For positions at or below L3, allow movement regardless of wrist angle
+        //     this.targetLocation = desiredTarget;
+        //     closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+
+        //     // if(getPosition() < ElevatorConstants.L3_Distance){
+        //     //     wrist.resume();
+        //     // }
+
+        // }
+
+        // printDashboard();
+
+        // SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
+        // SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
+
+
+
+        
+        // if(desiredTarget >= ElevatorConstants.Source_Distance && desiredTarget <= ElevatorConstants.L2_Distance && getPosition() <= ElevatorConstants.Source_Distance){
+        //     // If Below 
+        //     wrist.resume();
+        //     elevatorMoveToDesired();
+        // }else if(getPosition() <= ElevatorConstants.L2_Distance && desiredTarget >= ElevatorConstants.L2_Distance){
+        //     // If at Source or Home and Wanting to go to AlgaeL2_Distance, L2_Distnace, or Source, Don't care about source
+        //     if(wrist.isAtTarget()){
+        //         elevatorMoveToDesired();
+        //     }else{
+        //         wrist.resume();
+        //     }
+        // }
+
+
+    //;
 
     public void printDashboard() {
         SmartDashboard.putNumber("Elevator Position", elevatorMotor.getEncoder().getPosition());
