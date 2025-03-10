@@ -74,6 +74,10 @@ public class Wrist extends SubsystemBase {
         closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
     }
 
+    public void holdLastTarget(){
+        closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+    }
+
     // Command wrappers for the preset positions
     public Command goToL4Command() {
         return this.runOnce(() -> setTargetLocation(WristConstants.L4_Angle));
@@ -97,6 +101,10 @@ public class Wrist extends SubsystemBase {
 
     public Command goToAlage(){
         return this.runOnce(() -> setTargetLocation(WristConstants.Alage_Angle));
+    }
+
+    public boolean isAtTarget(){
+        return Math.abs(absoluteEncoder.getPosition() - targetLocation) < 0.02;
     }
 
     @Override
