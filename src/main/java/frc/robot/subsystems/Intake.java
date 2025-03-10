@@ -20,10 +20,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 public class Intake extends SubsystemBase {
     private final SparkMax intakeMotor;
     private static final int INTAKE_MOTOR_ID = 17; // Adjust this ID as needed
-    private static final double INTAKE_SPEED = 0.7; // 70% speed for intake
-    private static final double REVERSE_SPEED = -0.9; // 70% speed for outtake
-    private static final double STALL_SPEED = 0.35;
-    private static final double SLOW_REVERSE_SPEED = -0.5;
+    private static final double INTAKE_SPEED = 0.85; // 70% speed for intake
+    private static final double REVERSE_SPEED = -1; // 70% speed for outtake
+    private static final double STALL_SPEED = 0.5;
+    private static final double SLOW_REVERSE_SPEED = -0.65;
     public static SparkLimitSwitch limitSwitch;
     public         SparkMaxConfig config;
 
@@ -45,12 +45,6 @@ public class Intake extends SubsystemBase {
         );
     }
     public Command stallIntakeCommand() {
-        return this.runOnce(
-            () -> intakeMotor.set(STALL_SPEED));
-        
-    }
-
-        public Command manualStallCommand() {
         return this.runOnce(
             () -> intakeMotor.set(STALL_SPEED));
         
