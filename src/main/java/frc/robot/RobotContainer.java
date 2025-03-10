@@ -61,7 +61,7 @@ public class RobotContainer {
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
-    private final SendableChooser<Command> autoLocationChooser;
+    private final SendableChooser<String> autoLocationChooser;
 
     /* Subsystems */
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
@@ -98,10 +98,11 @@ public class RobotContainer {
 
         autoChooser = AutoBuilder.buildAutoChooser();
         autoLocationChooser = new SendableChooser<>();
-        autoLocationChooser.addOption("Left", null);
-        autoLocationChooser.addOption("Center", null);
-        autoLocationChooser.addOption("Right", null);
+        autoLocationChooser.addOption("Left", new String("Left"));
+        autoLocationChooser.addOption("Center", new String("Center"));
+        autoLocationChooser.addOption("Right", new String("Right"));
         SmartDashboard.putData("Auto Mode", autoChooser);
+        SmartDashboard.putData("Auto Location", autoLocationChooser);
 
         // Set default command for LEDs
         ledSubsystem.setDefaultCommand(new LEDDefaultCommand(
