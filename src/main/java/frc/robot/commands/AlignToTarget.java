@@ -66,8 +66,8 @@ public class AlignToTarget extends Command {
         
         // If on red alliance, invert X and Y coordinates
       
-            xController.setSetpoint(targetPose.getX());
-            yController.setSetpoint(targetPose.getY());
+        xController.setSetpoint(targetPose.getX());
+        yController.setSetpoint(targetPose.getY());
         rotationController.setSetpoint(targetPose.getRotation().getRadians());
     }
 
