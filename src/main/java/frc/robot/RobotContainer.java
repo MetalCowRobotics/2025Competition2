@@ -14,6 +14,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -118,15 +119,37 @@ public class RobotContainer {
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+
+        double distance = new Translation2d(
+            drivetrain.getState().Pose.getX(), 
+            drivetrain.getState().Pose.getY()
+        ).getDistance(
+            new Translation2d(
+                AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getX(), 
+                AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getY()
             )
         );
         
+        if(distance < 0.4){
+            drivetrain.setDefaultCommand(
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() ->
+                    fieldCentricDrive.withVelocityX(-driverController.getLeftY()/2 * MaxSpeed) // Drive forward with negative Y (forward)
+                        .withVelocityY(-driverController.getLeftX()/2 * MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(-driverController.getRightX()/2 * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                )
+            );
+        }else{
+            drivetrain.setDefaultCommand(
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() ->
+                    fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                        .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                )
+            );
+        }
+
         // Left Align Button 
         driverController.x().whileTrue(
             new AlignToTarget(drivetrain, () -> {
