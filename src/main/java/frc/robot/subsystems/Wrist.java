@@ -27,6 +27,14 @@ public class Wrist extends SubsystemBase {
     private double desiredLocation = 0;
     private final double SAFE_ANGLE = 0.35;
     private boolean isInSafePosition = false;
+    // private double kP = 0.09;
+    // private double kI = 0.12;
+    // private double kD = 0.1;
+
+    private double kP = 0.13;
+    private double kI = 0.08;
+    private double kD = 0.09;
+
 
     public Wrist() {
         wristMotor = new SparkMax(WristConstants.WRIST_MOTOR_ID, MotorType.kBrushless);
@@ -47,15 +55,16 @@ public class Wrist extends SubsystemBase {
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            .p(0.13)
-            .d(0.09)
-            .i(0.04)
+            .p(kP)
+            .d(kD)
+            .i(kI)
             .iZone(0.05)
-            .outputRange(-0.3, 0.3)
+            .outputRange(-0.4, 0.4)
             .maxMotion
             .maxVelocity(4200)
             .maxAcceleration(4000)
-            .allowedClosedLoopError(.02);
+            // .allowedClosedLoopError(.015);
+            .allowedClosedLoopError(.05);
 
         wristMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }

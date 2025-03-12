@@ -137,35 +137,33 @@ public class Elevator extends SubsystemBase {
     }
 
     public void elevatorMoveToDesired(){
+        this.targetLocation = this.desiredTarget;
         closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
     }
 
     @Override
     public void periodic() {
-        // If elevator is below L2 and desired target is below L2, move both together
         if (getPosition() <= ElevatorConstants.L2_Distance && desiredTarget <= ElevatorConstants.L2_Distance) {
-            wrist.resume();  // Wrist can move as desired
-            elevatorMoveToDesired();  // Elevator can move to its target location
+            wrist.resume();
+            elevatorMoveToDesired(); 
         }
         
-        // If the elevator is below L2 and we want to go above L2, make sure the wrist is at target first
         else if (getPosition() <= ElevatorConstants.L2_Distance && desiredTarget > ElevatorConstants.L2_Distance) {
             if (wrist.isAtTarget()) {
-                // Wrist is at its target, so now move the elevator
+
                 elevatorMoveToDesired();
             } else {
-                // Wait until wrist is at target, don't move the elevator
+
                 wrist.resume();
             }
         }
 
-        // If the elevator is above L2, we need to wait until it's below or at L2 before moving the wrist
         else if (getPosition() > ElevatorConstants.L2_Distance) {
             if (getPosition() <= ElevatorConstants.L2_Distance) {
-                wrist.resume();  // Now wrist can start moving as elevator reaches L2
+                wrist.resume();  
             } else {
-                wrist.holdLastTarget();  // Keep wrist moving as needed
-                elevatorMoveToDesired();  // Elevator continues moving until it reaches below or at L2
+                wrist.holdLastTarget();
+                elevatorMoveToDesired();
             }
         }
 
