@@ -12,6 +12,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -70,6 +71,7 @@ public class RobotContainer {
     private final Wrist wrist = new Wrist();
     private final Elevator elevator = new Elevator(wrist);
     private final Climb climb = new Climb();
+    double targetPosition = 0;
 
     /* Commands */
     private final ArmCommands armCommands;
@@ -98,11 +100,12 @@ public class RobotContainer {
         NamedCommands.registerCommand("Intake Hold", intake.startIntakeCommand());
 
         autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Auto Mode", autoChooser);
         autoLocationChooser = new SendableChooser<>();
         autoLocationChooser.addOption("Left", new String("Left"));
         autoLocationChooser.addOption("Center", new String("Center"));
         autoLocationChooser.addOption("Right", new String("Right"));
-        SmartDashboard.putData("Auto Mode", autoChooser);
+
         SmartDashboard.putData("Auto Location", autoLocationChooser);
 
         // Set default command for LEDs
@@ -175,8 +178,8 @@ public class RobotContainer {
         );
 
         /* Operator Commands */
-        operatorController.a().onTrue(armCommands.goToL2());     // L2 position on A
-        operatorController.b().onTrue(armCommands.goToL3());     // L3 position on B
+        // operatorController.a().onTrue(armCommands.goToL2());     // L2 position on A
+ 
         operatorController.y().onTrue(armCommands.goToL4());     // L4 position on Y
         operatorController.x().onTrue(armCommands.goToSource()); // Source position on X
 
@@ -196,6 +199,27 @@ public class RobotContainer {
         // Telementry Update
         drivetrain.registerTelemetry(logger::telemeterize);
 
+        // Manual Controls for Elevator
+        while (operatorController.getLeftY() > 0.3){
+            double currentElevatorPosition = elevator.getPosition();
+            targetPosition = currentElevatorPosition + 0.2;
+            
+            elevator.runOnce(() -> elevator.setTargetLocation(targetPosition));
+            elevator.elevatorMoveToDesired();
+        }
+
+        while (operatorController.a().getAsBoolean()){
+            double currentElevatorPosition = elevator.getPosition();
+            targetPosition = currentElevatorPosition - 1;
+
+
+            elevator.setTargetLocation(targetPosition);
+            elevator.elevatorMoveToDesired();
+        }
+
+        SmartDashboard.putNumber("Manual New Target", targetPosition);
+
+
 
         // Manual Control on Elevator
         // if(operatorController.getLeftY()>0.1){
@@ -212,19 +236,15 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        /* Run the path selected from the auto chooser */
-
         try{
-            PathPlannerPath selectedPath = PathPlannerPath.fromPathFile(autoChooser.getSelected().getName());
-
             if(autoLocationChooser.getSelected().equals("Right")){
-                return AutoBuilder.followPath(selectedPath.mirrorPath());
+                return new PathPlannerAuto(autoChooser.getSelected().getName(), true);
             }else{
-                return AutoBuilder.followPath(selectedPath);
+                return new PathPlannerAuto(autoChooser.getSelected().getName(), false);
             }
         }catch(Exception e){
                 DriverStation.reportError("PathPlanner ERROR: " + e.getMessage(), e.getStackTrace());
-                return Commands.none();
+                return null;
         }
     }
 }
