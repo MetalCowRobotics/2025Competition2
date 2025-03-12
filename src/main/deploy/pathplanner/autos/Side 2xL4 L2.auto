@@ -27,7 +27,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.45
+                        "waitTime": 0.1
                       }
                     },
                     {
@@ -51,7 +51,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.7
+            "waitTime": 0.3
           }
         },
         {
@@ -71,7 +71,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.0
+                        "waitTime": 0.6
                       }
                     },
                     {
@@ -93,7 +93,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "SourceToCoralK"
+                  "pathName": "SourceToCoralL"
                 }
               },
               {
@@ -103,7 +103,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.1
+                        "waitTime": 1.0
                       }
                     },
                     {
@@ -127,7 +127,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.7
+            "waitTime": 0.3
           }
         },
         {
@@ -137,7 +137,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralKToSource"
+                  "pathName": "CoralLToSource"
                 }
               },
               {
@@ -147,7 +147,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.0
+                        "waitTime": 0.6
                       }
                     },
                     {
@@ -169,7 +169,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "New Path"
+                  "pathName": "TopSourceToCenterL2"
                 }
               },
               {
@@ -192,6 +192,18 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Reverse Intake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.7
           }
         }
       ]
