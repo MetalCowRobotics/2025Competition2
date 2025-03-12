@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Stall Intake"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -44,26 +38,20 @@
                     }
                   ]
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stall Intake"
-                }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Reverse Intake"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.7
           }
         },
         {
@@ -101,12 +89,6 @@
         {
           "type": "named",
           "data": {
-            "name": "Stall Intake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Wrist Out"
           }
         },
@@ -137,12 +119,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stall Intake"
                 }
               }
             ]
@@ -190,12 +166,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stall Intake"
           }
         }
       ]

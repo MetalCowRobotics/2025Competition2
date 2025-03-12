@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Stall Intake"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -43,12 +37,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stall Intake"
                 }
               }
             ]
@@ -99,12 +87,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Stall Intake"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -131,12 +113,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stall Intake"
                 }
               }
             ]
