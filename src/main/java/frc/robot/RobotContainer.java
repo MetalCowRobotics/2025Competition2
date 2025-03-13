@@ -45,7 +45,7 @@ public class RobotContainer {
     /* Drive Request Objcets */
     private final SwerveRequest.FieldCentric fieldCentricDrive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1)// Accounts for 10% deadband from the movement joystick
-            .withRotationalDeadband(MaxAngularRate * 0.1) // Accounts for 10% deadband from the rotational joystick
+            .withRotationalDeadband(MaxAngularRate * 0.3) // Accounts for 30% deadband from the rotational joystick
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors making it respond from raw inputs
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
