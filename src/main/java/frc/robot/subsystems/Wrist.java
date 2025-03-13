@@ -4,8 +4,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLimitSwitch;
-import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -27,53 +25,41 @@ public class Wrist extends SubsystemBase {
     private double desiredLocation = 0;
     private final double SAFE_ANGLE = 0.35;
     private boolean isInSafePosition = false;
-    // private double kP = 0.09;
-    // private double kI = 0.12;
-    // private double kD = 0.1;
 
     private double kP = 0.15;
     private double kI = 0.06;
     private double kD = 0.07;
     private double kF = 0.2;
-    SparkMaxConfig config;
 
+    SparkMaxConfig config;
 
     public Wrist() {
         wristMotor = new SparkMax(WristConstants.WRIST_MOTOR_ID, MotorType.kBrushless);
         closedLoopController = wristMotor.getClosedLoopController();
-        
-        // Configure the absolute encoder
         absoluteEncoder = wristMotor.getAbsoluteEncoder();
-        
+
         this.config = new SparkMaxConfig();
-        config.inverted(true);
-        config.idleMode(IdleMode.kBrake)
+        config.inverted(true)
+             .idleMode(IdleMode.kBrake)
              .smartCurrentLimit(50)
              .voltageCompensation(12);
 
-        // Enable soft limits
-        config.softLimit
-           .forwardSoftLimit(0.75);
+        config.softLimit.forwardSoftLimit(0.75);
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            // .p(kP)
-            // .d(kD)
-            // .i(kI)
             .pidf(kP, kI, kD, kF)
             .iZone(0.05)
             .outputRange(-0.4, 0.4)
             .maxMotion
             .maxVelocity(4200)
             .maxAcceleration(4000)
-            // .allowedClosedLoopError(.015);
             .allowedClosedLoopError(.025);
 
         wristMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public void setTargetLocation(double targetLocation) {
-        // Constrain target location between 0 and 0.75
         this.desiredLocation = Math.min(Math.max(targetLocation, 0), 0.75);
     }
 
@@ -90,7 +76,6 @@ public class Wrist extends SubsystemBase {
         closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
     }
 
-    // Command wrappers for the preset positions
     public Command goToL4Command() {
         return this.runOnce(() -> setTargetLocation(WristConstants.L4_Angle));
     }
@@ -111,25 +96,22 @@ public class Wrist extends SubsystemBase {
         return this.runOnce(() -> setTargetLocation(WristConstants.Forward_Angle));
     }
 
-    public Command goToAlage(){
+    public Command goToAlage() {
         return this.runOnce(() -> setTargetLocation(WristConstants.Alage_Angle));
     }
 
-    public boolean isAtTarget(){
+    public boolean isAtTarget() {
         return Math.abs(absoluteEncoder.getPosition() - desiredLocation) < 0.025;
-
     }
 
     @Override
     public void periodic() {
-        // Update safety status
-        // kF = 0.3 * Math.sin(Math.toRadians(this.getCurrentAngle() * 360));
-        // config.closedLoop.pidf(kP, kI, kD, kF);
-        // wristMotor.configure(this.config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        SmartDashboard.putNumber("Wrist/P Gain", kP);
+        SmartDashboard.putNumber("Wrist/I Gain", kI);
+        SmartDashboard.putNumber("Wrist/D Gain", kD);
+        SmartDashboard.putNumber("Wrist/F Gain", kF);
 
-
-        // Encoder information
-        SmartDashboard.putNumber("Wrist Error", (int)Math.abs(targetLocation - absoluteEncoder.getPosition()));
+        SmartDashboard.putNumber("Wrist Error", Math.abs(targetLocation - absoluteEncoder.getPosition()));
         SmartDashboard.putNumber("Wrist/Absolute Position", absoluteEncoder.getPosition());
         SmartDashboard.putNumber("Wrist/Absolute Velocity", absoluteEncoder.getVelocity());
         SmartDashboard.putNumber("Wrist/Target Location", targetLocation);
@@ -137,8 +119,7 @@ public class Wrist extends SubsystemBase {
         SmartDashboard.putBoolean("Wrist/Is Safe Position", isInSafePosition);
         SmartDashboard.putNumber("Wrist/Safe Angle Threshold", SAFE_ANGLE);
         SmartDashboard.putNumber("Wrist/Forward Limit", 0.75);
-        
-        // Motor information
+
         SmartDashboard.putNumber("Wrist/Motor Output", wristMotor.getAppliedOutput());
         SmartDashboard.putNumber("Wrist/Motor Current", wristMotor.getOutputCurrent());
     }
@@ -150,4 +131,4 @@ public class Wrist extends SubsystemBase {
     public boolean isAtSafeAngle() {
         return isInSafePosition;
     }
-} 
+}
