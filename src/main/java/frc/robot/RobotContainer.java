@@ -182,6 +182,8 @@ public class RobotContainer {
  
         operatorController.y().onTrue(armCommands.goToL4());     // L4 position on Y
         operatorController.x().onTrue(armCommands.goToSource()); // Source position on X
+        operatorController.b().onTrue(armCommands.goToL3());     // L4 position on Y
+        operatorController.a().onTrue(armCommands.goToL2());
 
         operatorController.rightTrigger().onTrue(armCommands.goToAlgaeL2()); // Remove algae from L2 on Right Trigger
         operatorController.leftTrigger().onTrue(armCommands.goToAlgaeL3()); // Remove algae from L3 on Right Trigger
@@ -195,6 +197,7 @@ public class RobotContainer {
 
         // Climb Control
         driverController.a().whileTrue(climb.runClimb());
+        driverController.y().whileTrue(climb.reverseClimb());
 
         // Telementry Update
         drivetrain.registerTelemetry(logger::telemeterize);

@@ -141,31 +141,70 @@ public class Elevator extends SubsystemBase {
         closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
     }
 
+    // @Override
+    // public void periodic() {
+    //     double currentPosition = getPosition();
+    //     boolean wristAtTarget = wrist.isAtTarget();
+
+    //     if (currentPosition <= ElevatorConstants.L2_Distance) {
+    //         wrist.resume();
+    //         elevatorMoveToDesired();
+    //     } else {
+    //         if (desiredTarget <= ElevatorConstants.L2_Distance) {
+    //             wrist.resume();
+
+    //             if(wristAtTarget){
+    //                 elevatorMoveToDesired();
+    //             }
+    //         } else {
+    //             if (wristAtTarget) {
+    //                 elevatorMoveToDesired();
+    //             } else {
+    //                 wrist.holdLastTarget();
+    //             }
+    //         }
+    //     }
+
+    //     printDashboard();
+
+    //     SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
+    //     SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
+    // }
+
     @Override
     public void periodic() {
         if (getPosition() <= ElevatorConstants.L2_Distance && desiredTarget <= ElevatorConstants.L2_Distance) {
             wrist.resume();
             elevatorMoveToDesired(); 
         }
-        
         else if (getPosition() <= ElevatorConstants.L2_Distance && desiredTarget > ElevatorConstants.L2_Distance) {
             if (wrist.isAtTarget()) {
-
                 elevatorMoveToDesired();
             } else {
-
                 wrist.resume();
             }
         }
+        else if(getPosition() > ElevatorConstants.L2_Distance){
+            elevatorMoveToDesired();
+            wrist.holdLastTarget();
 
-        else if (getPosition() > ElevatorConstants.L2_Distance) {
-            if (getPosition() <= ElevatorConstants.L2_Distance) {
-                wrist.resume();  
-            } else {
-                wrist.holdLastTarget();
-                elevatorMoveToDesired();
+            if(getPosition() <= ElevatorConstants.L2_Distance){
+                wrist.resume();
             }
         }
+        // else if (getPosition() > ElevatorConstants.L2_Distance) {
+        //     if (getPosition() <= ElevatorConstants.L2_Distance) {
+        //         wrist.resume();  
+        //     } else {
+        //         if (wrist.isAtTarget()) {
+
+        //             elevatorMoveToDesired();
+        //         } else {
+    
+        //             wrist.holdLastTarget();
+        //         }
+        //     }
+        // }
 
         printDashboard();
 

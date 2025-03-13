@@ -31,9 +31,11 @@ public class Wrist extends SubsystemBase {
     // private double kI = 0.12;
     // private double kD = 0.1;
 
-    private double kP = 0.13;
-    private double kI = 0.08;
-    private double kD = 0.09;
+    private double kP = 0.15;
+    private double kI = 0.06;
+    private double kD = 0.07;
+    private double kF = 0.2;
+    SparkMaxConfig config;
 
 
     public Wrist() {
@@ -43,7 +45,7 @@ public class Wrist extends SubsystemBase {
         // Configure the absolute encoder
         absoluteEncoder = wristMotor.getAbsoluteEncoder();
         
-        SparkMaxConfig config = new SparkMaxConfig();
+        this.config = new SparkMaxConfig();
         config.inverted(true);
         config.idleMode(IdleMode.kBrake)
              .smartCurrentLimit(50)
@@ -55,16 +57,17 @@ public class Wrist extends SubsystemBase {
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            .p(kP)
-            .d(kD)
-            .i(kI)
+            // .p(kP)
+            // .d(kD)
+            // .i(kI)
+            .pidf(kP, kI, kD, kF)
             .iZone(0.05)
             .outputRange(-0.4, 0.4)
             .maxMotion
             .maxVelocity(4200)
             .maxAcceleration(4000)
             // .allowedClosedLoopError(.015);
-            .allowedClosedLoopError(.05);
+            .allowedClosedLoopError(.025);
 
         wristMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -113,15 +116,20 @@ public class Wrist extends SubsystemBase {
     }
 
     public boolean isAtTarget(){
-        return Math.abs(absoluteEncoder.getPosition() - targetLocation) < 0.02;
+        return Math.abs(absoluteEncoder.getPosition() - desiredLocation) < 0.025;
+
     }
 
     @Override
     public void periodic() {
         // Update safety status
-        isInSafePosition = getCurrentAngle() >= SAFE_ANGLE;
+        // kF = 0.3 * Math.sin(Math.toRadians(this.getCurrentAngle() * 360));
+        // config.closedLoop.pidf(kP, kI, kD, kF);
+        // wristMotor.configure(this.config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
 
         // Encoder information
+        SmartDashboard.putNumber("Wrist Error", (int)Math.abs(targetLocation - absoluteEncoder.getPosition()));
         SmartDashboard.putNumber("Wrist/Absolute Position", absoluteEncoder.getPosition());
         SmartDashboard.putNumber("Wrist/Absolute Velocity", absoluteEncoder.getVelocity());
         SmartDashboard.putNumber("Wrist/Target Location", targetLocation);
