@@ -62,6 +62,18 @@ public class Climb extends SubsystemBase {
         );
     }
 
+    public Command reverseClimb() {
+        return this.startEnd(
+            // When command starts
+            () -> climbMotor.set(-CLIMB_SPEED),
+            // When command ends
+            () -> {
+                climbMotor.set(0);
+
+            }
+        );
+    }
+
     // public Command runClimb(){
     //     return this.runOnce(() -> {climbMOtor.set(CLIMB_SPEED)})
     // }
