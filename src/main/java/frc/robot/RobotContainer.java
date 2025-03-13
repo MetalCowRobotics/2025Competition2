@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.AlignToTarget;
 import frc.robot.commands.ArmCommands;
 import frc.robot.commands.LEDDefaultCommand;
@@ -178,9 +179,19 @@ public class RobotContainer {
         );
 
         /* Operator Commands */
-        // operatorController.a().onTrue(armCommands.goToL2());     // L2 position on A
- 
-        operatorController.y().onTrue(armCommands.goToL4());     // L4 position on Y
+
+        // Makes L4 Only Available When 1 Meter Close to Reef
+        operatorController.y().onTrue(
+            new InstantCommand(() -> {
+                if (distance < 1) {
+                    armCommands.goToL4();
+                }
+            })
+        );
+
+        operatorController.y().onTrue(armCommands.goToL4());
+        
+        // L4 position on Y
         operatorController.x().onTrue(armCommands.goToSource()); // Source position on X
         operatorController.b().onTrue(armCommands.goToL3());     // L4 position on Y
         operatorController.a().onTrue(armCommands.goToL2());
