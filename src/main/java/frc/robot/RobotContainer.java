@@ -181,13 +181,15 @@ public class RobotContainer {
         /* Operator Commands */
 
         // Makes L4 Only Available When 1 Meter Close to Reef
-        operatorController.y().onTrue(
-            new InstantCommand(() -> {
-                if (distance < 1) {
-                    armCommands.goToL4();
-                }
-            })
-        );
+
+        // not using currently since robot doesn't have limelights on it
+        // operatorController.y().onTrue(
+        //     new InstantCommand(() -> {
+        //         if (distance < 1.25) {
+        //             armCommands.goToL4();
+        //         }
+        //     })
+        // );
 
         operatorController.y().onTrue(armCommands.goToL4());
         
