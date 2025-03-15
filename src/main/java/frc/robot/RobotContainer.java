@@ -162,25 +162,20 @@ public class RobotContainer {
         //     );
         // }
 
-        if(driverController.rightTrigger().getAsBoolean()){
-            drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() ->
-                    fieldCentricDrive.withVelocityX(-driverController.getLeftY() * CrawlMaxSpeed) // Drive forward with negative Y (forward)
-                        .withVelocityY(-driverController.getLeftX() * CrawlMaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(-driverController.getRightX() * CrawlMaxAngularRate) // Drive counterclockwise with negative X (left)
-                )
-            );
-        }else{
-            drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() ->
-                    fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                        .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-                )
-            );
-        }
+        drivetrain.setDefaultCommand(
+            drivetrain.applyRequest(() -> {
+                if (driverController.rightTrigger().getAsBoolean()) {
+                    return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * CrawlMaxSpeed) 
+                                            .withVelocityY(-driverController.getLeftX() * CrawlMaxSpeed) 
+                                            .withRotationalRate(-driverController.getRightX() * CrawlMaxAngularRate);
+                } else {
+                    return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) 
+                                            .withVelocityY(-driverController.getLeftX() * MaxSpeed) 
+                                            .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
+                }
+            })
+        );
+        
 
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
