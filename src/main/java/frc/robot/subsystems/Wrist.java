@@ -26,10 +26,9 @@ public class Wrist extends SubsystemBase {
     private final double SAFE_ANGLE = 0.35;
     private boolean isInSafePosition = false;
 
-    private double kP = 0.15;
-    private double kI = 0.06;
-    private double kD = 0.07;
-    private double kF = 0.2;
+    private double kP = 0.21;
+    private double kI = 0.265;
+    private double kD = 0.28;
 
     SparkMaxConfig config;
 
@@ -48,7 +47,7 @@ public class Wrist extends SubsystemBase {
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            .pidf(kP, kI, kD, kF)
+            .pid(kP, kI, kD)
             .iZone(0.05)
             .outputRange(-0.4, 0.4)
             .maxMotion
@@ -106,10 +105,12 @@ public class Wrist extends SubsystemBase {
 
     @Override
     public void periodic() {
+
+         
+
         SmartDashboard.putNumber("Wrist/P Gain", kP);
         SmartDashboard.putNumber("Wrist/I Gain", kI);
         SmartDashboard.putNumber("Wrist/D Gain", kD);
-        SmartDashboard.putNumber("Wrist/F Gain", kF);
 
         SmartDashboard.putNumber("Wrist Error", Math.abs(targetLocation - absoluteEncoder.getPosition()));
         SmartDashboard.putNumber("Wrist/Absolute Position", absoluteEncoder.getPosition());
