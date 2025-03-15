@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
     private static final int INTAKE_MOTOR_ID = 17; // Adjust this ID as needed
     private static final double INTAKE_SPEED = 0.85; // 70% speed for intake
     private static final double REVERSE_SPEED = -1; // 70% speed for outtake
-    private static final double STALL_SPEED = 0.8;
+    private static final double STALL_SPEED = 0.3;
     private static final double SLOW_REVERSE_SPEED = -0.65;
     public static SparkLimitSwitch limitSwitch;
     public         SparkMaxConfig config;
@@ -31,7 +31,7 @@ public class Intake extends SubsystemBase {
         intakeMotor = new SparkMax(INTAKE_MOTOR_ID, MotorType.kBrushed);
         
         // Configure the motor
-        limitSwitch = intakeMotor.getForwardLimitSwitch();
+        limitSwitch = intakeMotor.getForwardLimitSwitch(); 
         config = new SparkMaxConfig();
         config.limitSwitch.forwardLimitSwitchEnabled(false);
 

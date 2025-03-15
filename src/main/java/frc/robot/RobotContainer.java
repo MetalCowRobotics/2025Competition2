@@ -42,10 +42,14 @@ public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)/2; // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second
 
+
+    private double CrawlMaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)/4; // kSpeedAt12Volts desired top speed
+    private double CrawlMaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond)/2; // 1/2 of a rotation per second
+
     /* Drive Request Objcets */
     private final SwerveRequest.FieldCentric fieldCentricDrive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1)// Accounts for 10% deadband from the movement joystick
-            .withRotationalDeadband(MaxAngularRate * 0.3) // Accounts for 30% deadband from the rotational joystick
+            .withRotationalDeadband(MaxAngularRate * 0.1) // Accounts for 30% deadband from the rotational joystick
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors making it respond from raw inputs
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -124,23 +128,47 @@ public class RobotContainer {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
 
-        double distance = new Translation2d(
-            drivetrain.getState().Pose.getX(), 
-            drivetrain.getState().Pose.getY()
-        ).getDistance(
-            new Translation2d(
-                AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getX(), 
-                AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getY()
-            )
-        );
+        // double distance = new Translation2d(
+        //     drivetrain.getState().Pose.getX(), 
+        //     drivetrain.getState().Pose.getY()
+        // ).getDistance(
+        //     new Translation2d(
+        //         AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getX(), 
+        //         AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getY()
+        //     )
+        // );
+
+        // SmartDashboard.putNumber("Distance to Closest Target", distance);
         
-        if(distance < 0.4){
+        // if(distance < 1){
+        //     SmartDashboard.putBoolean("Slow Down Motors", true);
+        //     drivetrain.setDefaultCommand(
+        //         // Drivetrain will execute this command periodically
+        //         drivetrain.applyRequest(() ->
+        //             fieldCentricDrive.withVelocityX(-driverController.getLeftY()/2 * MaxSpeed) // Drive forward with negative Y (forward)
+        //                 .withVelocityY(-driverController.getLeftX()/2 * MaxSpeed) // Drive left with negative X (left)
+        //                 .withRotationalRate(-driverController.getRightX()/2 * MaxAngularRate) // Drive counterclockwise with negative X (left)
+        //         )
+        //     );
+        // }else{
+        //     SmartDashboard.putBoolean("Slow Down Motors", false);
+        //     drivetrain.setDefaultCommand(
+        //         // Drivetrain will execute this command periodically
+        //         drivetrain.applyRequest(() ->
+        //             fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+        //                 .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+        //                 .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+        //         )
+        //     );
+        // }
+
+        if(driverController.rightTrigger().getAsBoolean()){
             drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() ->
-                    fieldCentricDrive.withVelocityX(-driverController.getLeftY()/2 * MaxSpeed) // Drive forward with negative Y (forward)
-                        .withVelocityY(-driverController.getLeftX()/2 * MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(-driverController.getRightX()/2 * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                    fieldCentricDrive.withVelocityX(-driverController.getLeftY() * CrawlMaxSpeed) // Drive forward with negative Y (forward)
+                        .withVelocityY(-driverController.getLeftX() * CrawlMaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(-driverController.getRightX() * CrawlMaxAngularRate) // Drive counterclockwise with negative X (left)
                 )
             );
         }else{
@@ -153,6 +181,15 @@ public class RobotContainer {
                 )
             );
         }
+
+        drivetrain.setDefaultCommand(
+            // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(() ->
+                fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            )
+        );
 
         // Left Align Button 
         driverController.x().whileTrue(
@@ -204,6 +241,7 @@ public class RobotContainer {
         // Manual Control On Intake
         operatorController.leftBumper().onTrue(intake.reverseIntakeCommand()); // Release Coral on Left Bumper
         operatorController.rightBumper().onTrue(intake.stallIntakeCommand());  // Keep Coral In on Right Bumper
+        operatorController.start().onTrue(intake.stopIntakeCommand());
         
         // Rest position on driver left bumper
         driverController.leftBumper().onTrue(armCommands.goToRest()); // Home Position

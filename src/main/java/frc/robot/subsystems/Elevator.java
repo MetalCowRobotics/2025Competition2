@@ -153,67 +153,67 @@ public class Elevator extends SubsystemBase {
 
     /* Motion Planning Logic 1: */ 
 
-    // @Override
-    // public void periodic() {
-    //     if (getPosition() <= ElevatorConstants.L2_Distance && desiredTarget <= ElevatorConstants.L2_Distance) {
-    //         wrist.resume();
-    //         elevatorMoveToDesired(); 
-    //     }
-    //     else if (getPosition() <= ElevatorConstants.L2_Distance && desiredTarget > ElevatorConstants.L2_Distance) {
-    //         if (wrist.isAtTarget()) {
-    //             elevatorMoveToDesired();
-    //         } else {
-    //             wrist.resume();
-    //         }
-    //     }
-    //     else if(getPosition() > ElevatorConstants.L2_Distance){
-    //         elevatorMoveToDesired();
-    //         wrist.holdLastTarget();
-
-    //         if(getPosition() <= ElevatorConstants.L2_Distance){
-    //             wrist.resume();
-    //         }
-    //     }
-
-    //     printDashboard();
-
-    //     SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
-    //     SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
-    // }
-
-    /* Motion Planning Logic 2: */ 
-
     @Override
     public void periodic() {
-        // Case 1: Free movement when staying below L2
-        if (isBelowL2() && targetLocation <= ElevatorConstants.L2_Distance) {
+        if (getPosition() <= ElevatorConstants.L2_Distance && targetLocation < ElevatorConstants.L2_Distance) {
             wrist.resume();
-            elevatorMoveToDesired();
+            elevatorMoveToDesired(); 
         }
-        // Case 2: Free movement when staying above L2
-        else if (isAboveL2() && targetLocation > ElevatorConstants.L2_Distance) {
-            wrist.resume();
-            elevatorMoveToDesired();
-        }
-        // Case 3: Moving up past L2 (Wrist must extend first, but elevator can start moving up to L2)
-        else if (isBelowL2() && targetLocation > ElevatorConstants.L2_Distance) {
-            wrist.resume();
+        else if (getPosition() <= ElevatorConstants.L2_Distance && targetLocation >= ElevatorConstants.L2_Distance) {
             if (wrist.isAtTarget()) {
                 elevatorMoveToDesired();
             } else {
-                elevatorMoveToL2();
-            }
-        }
-        // Case 4: Moving down past L2 (Elevator must move first, wrist waits)
-        else if (isAboveL2() && targetLocation <= ElevatorConstants.L2_Distance) {
-            elevatorMoveToDesired();
-            if (isBelowL2()) {
                 wrist.resume();
-            } else {
-                wrist.holdLastTarget();
             }
         }
+        else if(getPosition() > ElevatorConstants.L2_Distance){
+            elevatorMoveToDesired();
+            wrist.holdLastTarget();
+
+            if(getPosition() <= ElevatorConstants.L2_Distance){
+                wrist.resume();
+            }
+        }
+
+        printDashboard();
+
+        SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
     }
+
+    /* Motion Planning Logic 2: */ 
+
+    // @Override
+    // public void periodic() {
+    //     // Case 1: Free movement when staying below L2
+    //     if (isBelowL2() && targetLocation <= ElevatorConstants.L2_Distance) {
+    //         wrist.resume();
+    //         elevatorMoveToDesired();
+    //     }
+    //     // Case 2: Free movement when staying above L2
+    //     else if (isAboveL2() && targetLocation > ElevatorConstants.L2_Distance) {
+    //         wrist.resume();
+    //         elevatorMoveToDesired();
+    //     }
+    //     // Case 3: Moving up past L2 (Wrist must extend first, but elevator can start moving up to L2)
+    //     else if (isBelowL2() && targetLocation > ElevatorConstants.L2_Distance) {
+    //         wrist.resume();
+    //         if (wrist.isAtTarget()) {
+    //             elevatorMoveToDesired();
+    //         } else {
+    //             elevatorMoveToL2();
+    //         }
+    //     }
+    //     // Case 4: Moving down past L2 (Elevator must move first, wrist waits)
+    //     else if (isAboveL2() && targetLocation <= ElevatorConstants.L2_Distance) {
+    //         elevatorMoveToDesired();
+    //         if (isBelowL2()) {
+    //             wrist.resume();
+    //         } else {
+    //             wrist.holdLastTarget();
+    //         }
+    //     }
+    // }
 
     public void printDashboard() {
         SmartDashboard.putNumber("Elevator Position", elevatorMotor.getEncoder().getPosition());

@@ -22,9 +22,9 @@ public class AlignToTarget extends Command {
     private final PIDController rotationController;
     private final SwerveRequest.FieldCentric fieldCentric = new SwerveRequest.FieldCentric();
     private static final double ACTIVATION_DISTANCE_METERS = 1;
-    private static final double SLOW_DOWN_DISTANCE_METERS = 0.127; // 5 inches in meters
+    private static final double SLOW_DOWN_DISTANCE_METERS = 0.3048; // 12 inches in meters
     private static final double MAX_SPEED_FAR = 3.0; // Increased from 4.0 to 6.0 m/s
-    private static final double MAX_SPEED_NEAR = 0.5; // Increased from 2.0 to 3.0 m/s
+    private static final double MAX_SPEED_NEAR = 0.25; // Increased from 2.0 to 3.0 m/s
     private static final double MAX_ROTATION_SPEED_FAR = 8.0; // Increased from 4.0 to 8.0 rad/s
     private static final double MAX_ROTATION_SPEED_NEAR = 4.0; // Increased from 2.0 to 4.0 rad/s
     private boolean isRedAlliance;
