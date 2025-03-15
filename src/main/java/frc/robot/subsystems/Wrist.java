@@ -105,9 +105,6 @@ public class Wrist extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-         
-
         SmartDashboard.putNumber("Wrist/P Gain", kP);
         SmartDashboard.putNumber("Wrist/I Gain", kI);
         SmartDashboard.putNumber("Wrist/D Gain", kD);

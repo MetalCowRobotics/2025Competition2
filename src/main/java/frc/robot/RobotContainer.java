@@ -125,43 +125,6 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-
-        // double distance = new Translation2d(
-        //     drivetrain.getState().Pose.getX(), 
-        //     drivetrain.getState().Pose.getY()
-        // ).getDistance(
-        //     new Translation2d(
-        //         AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getX(), 
-        //         AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getY()
-        //     )
-        // );
-
-        // SmartDashboard.putNumber("Distance to Closest Target", distance);
-        
-        // if(distance < 1){
-        //     SmartDashboard.putBoolean("Slow Down Motors", true);
-        //     drivetrain.setDefaultCommand(
-        //         // Drivetrain will execute this command periodically
-        //         drivetrain.applyRequest(() ->
-        //             fieldCentricDrive.withVelocityX(-driverController.getLeftY()/2 * MaxSpeed) // Drive forward with negative Y (forward)
-        //                 .withVelocityY(-driverController.getLeftX()/2 * MaxSpeed) // Drive left with negative X (left)
-        //                 .withRotationalRate(-driverController.getRightX()/2 * MaxAngularRate) // Drive counterclockwise with negative X (left)
-        //         )
-        //     );
-        // }else{
-        //     SmartDashboard.putBoolean("Slow Down Motors", false);
-        //     drivetrain.setDefaultCommand(
-        //         // Drivetrain will execute this command periodically
-        //         drivetrain.applyRequest(() ->
-        //             fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-        //                 .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-        //                 .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-        //         )
-        //     );
-        // }
-
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() -> {
                 if (driverController.rightTrigger().getAsBoolean()) {
@@ -174,16 +137,6 @@ public class RobotContainer {
                                             .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
                 }
             })
-        );
-        
-
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
         );
 
         // Left Align Button 
