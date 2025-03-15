@@ -18,7 +18,7 @@ public final class ArmCommands {
 
     // Rest Position Command
     public Command goToRest() {
-        return elevator.goToRestCommand().alongWith(wrist.goToRestCommand());
+        return elevator.goToRestCommand().alongWith(wrist.goToRestCommand()).andThen(intake.stopIntakeCommand());
     }
 
     // Source Position with Intake Command
