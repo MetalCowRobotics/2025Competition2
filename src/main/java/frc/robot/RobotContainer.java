@@ -49,7 +49,7 @@ public class RobotContainer {
     /* Drive Request Objcets */
     private final SwerveRequest.FieldCentric fieldCentricDrive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1)// Accounts for 10% deadband from the movement joystick
-            .withRotationalDeadband(MaxAngularRate * 0.1) // Accounts for 30% deadband from the rotational joystick
+            .withRotationalDeadband(MaxAngularRate * 0.1) // Accounts for 10% deadband from the rotational joystick
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors making it respond from raw inputs
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -85,6 +85,8 @@ public class RobotContainer {
         // Create vision subsystem after drivetrain
         vision = new Vision(drivetrain);
         
+        SmartDashboard.putNumber("Max Speed:", MaxSpeed);
+        SmartDashboard.putNumber("Max Angular Rate:", MaxAngularRate);
         // Initialize arm commands
         armCommands = new ArmCommands(elevator, wrist, intake);
         
@@ -125,9 +127,6 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-
-
-
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() -> {
 
@@ -145,7 +144,14 @@ public class RobotContainer {
                     return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * CrawlMaxSpeed) 
                                             .withVelocityY(-driverController.getLeftX() * CrawlMaxSpeed) 
                                             .withRotationalRate(-driverController.getRightX() * CrawlMaxAngularRate);
-                } else {
+
+                } 
+                // } else if(driverController.leftTrigger().getAsBoolean()){
+                //     return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed * 2) 
+                //     .withVelocityY(-driverController.getLeftX() * MaxSpeed * 2) 
+                //     .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
+                // }
+                else {
                     return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) 
                                             .withVelocityY(-driverController.getLeftX() * MaxSpeed) 
                                             .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
@@ -215,25 +221,28 @@ public class RobotContainer {
         // Telementry Update
         drivetrain.registerTelemetry(logger::telemeterize);
 
+
+
+
         // Manual Controls for Elevator
-        while (operatorController.getLeftY() > 0.3){
-            double currentElevatorPosition = elevator.getPosition();
-            targetPosition = currentElevatorPosition + 0.2;
+        // while (operatorController.getLeftY() > 0.3){
+        //     double currentElevatorPosition = elevator.getPosition();
+        //     targetPosition = currentElevatorPosition + 0.2;
             
-            elevator.runOnce(() -> elevator.setTargetLocation(targetPosition));
-            elevator.elevatorMoveToDesired();
-        }
+        //     elevator.runOnce(() -> elevator.setTargetLocation(targetPosition));
+        //     elevator.elevatorMoveToDesired();
+        // }
 
-        while (operatorController.a().getAsBoolean()){
-            double currentElevatorPosition = elevator.getPosition();
-            targetPosition = currentElevatorPosition - 1;
+        // while (operatorController.a().getAsBoolean()){
+        //     double currentElevatorPosition = elevator.getPosition();
+        //     targetPosition = currentElevatorPosition - 1;
 
 
-            elevator.setTargetLocation(targetPosition);
-            elevator.elevatorMoveToDesired();
-        }
+        //     elevator.setTargetLocation(targetPosition);
+        //     elevator.elevatorMoveToDesired();
+        // }
 
-        SmartDashboard.putNumber("Manual New Target", targetPosition);
+
 
 
 
