@@ -125,9 +125,23 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+
+
+
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() -> {
-                if (driverController.rightTrigger().getAsBoolean()) {
+
+                double distanceToReef = new Translation2d(
+                    drivetrain.getState().Pose.getX(), 
+                    drivetrain.getState().Pose.getY()
+                ).getDistance(
+                    new Translation2d(
+                        AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getX(), 
+                        AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getY()
+                    )
+                );
+
+                if (driverController.rightTrigger().getAsBoolean() || distanceToReef <= 0.4) {
                     return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * CrawlMaxSpeed) 
                                             .withVelocityY(-driverController.getLeftX() * CrawlMaxSpeed) 
                                             .withRotationalRate(-driverController.getRightX() * CrawlMaxAngularRate);
@@ -138,7 +152,7 @@ public class RobotContainer {
                 }
             })
         );
-
+ 
         // Left Align Button 
         driverController.x().whileTrue(
             new AlignToTarget(drivetrain, () -> {

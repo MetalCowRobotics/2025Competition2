@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CoralHToAlageRemove"
+                  "pathName": "CoralHToAlgaeRemove"
                 }
               },
               {
@@ -95,13 +95,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "HAlageToRemove"
+            "pathName": "HAlgaeToRemove"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "RemoveAlgaeH"
           }
         }
       ]
