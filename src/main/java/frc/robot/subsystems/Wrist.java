@@ -26,9 +26,13 @@ public class Wrist extends SubsystemBase {
     private final double SAFE_ANGLE = 0.35;
     private boolean isInSafePosition = false;
 
-    private double kP = 0.28;
-    private double kI = 0.265;
-    private double kD = 0.27;
+    private double kP = 0.1;
+    private double kI = 0;
+    private double kD = 0;
+
+    // private double kP = 0.28;
+    // private double kI = 0.265;
+    // private double kD = 0.27;
 
     SparkMaxConfig config;
 
@@ -38,7 +42,7 @@ public class Wrist extends SubsystemBase {
         absoluteEncoder = wristMotor.getAbsoluteEncoder();
 
         this.config = new SparkMaxConfig();
-        config.inverted(true)
+        config.inverted(false)
              .idleMode(IdleMode.kBrake)
              .smartCurrentLimit(70)
              .voltageCompensation(12);
@@ -51,8 +55,8 @@ public class Wrist extends SubsystemBase {
             .iZone(0.05)
             .outputRange(-0.7, 0.7)
             .maxMotion
-            .maxVelocity(5200)
-            .maxAcceleration(5000)
+            .maxVelocity(500)
+            .maxAcceleration(500)
             .allowedClosedLoopError(.025);
 
         wristMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
