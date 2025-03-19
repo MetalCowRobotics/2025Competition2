@@ -28,7 +28,7 @@ public class Wrist extends SubsystemBase {
     private boolean isInSafePosition = false;
 
     private double kP = 0.5;
-    private double kI = 0.001;
+    private double kI = 0.005;
     private double kD = 1.2;
 
     // private double kP = 0.28;
@@ -44,6 +44,7 @@ public class Wrist extends SubsystemBase {
         absoluteEncoder = wristMotor.getAbsoluteEncoder();
         absoluteEncoderConfig = new AbsoluteEncoderConfig();
         absoluteEncoderConfig.inverted(true);
+  
 
         this.config = new SparkMaxConfig();
         config.inverted(false)
@@ -59,16 +60,17 @@ public class Wrist extends SubsystemBase {
 
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
             .p(kP)
-            // .i(kI)
+        
+            .i(kI)
             // .d(kD)
-            // .minOutput(-0.01)
-            // .maxOutput(0.01)
-            .iZone(0.1)
+            .iZone(0.03)
+
             .outputRange(-0.2,0.2)
             .maxMotion
             .maxVelocity(500)
             .maxAcceleration(500)
             .allowedClosedLoopError(.025);
+    
 
         wristMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -136,7 +138,9 @@ public class Wrist extends SubsystemBase {
         SmartDashboard.putBoolean("Wrist/Is Safe Position", isInSafePosition);
         SmartDashboard.putNumber("Wrist/Safe Angle Threshold", SAFE_ANGLE);
         SmartDashboard.putNumber("Wrist/Forward Limit", 0.75);
-
+        SmartDashboard.putNumber("Wrist I Accumlated",  wristMotor.getClosedLoopController().getIAccum());
+       
+    
         SmartDashboard.putNumber("Wrist/Motor Output", wristMotor.getAppliedOutput());
         SmartDashboard.putNumber("Wrist/Motor Current", wristMotor.getOutputCurrent());
     }
