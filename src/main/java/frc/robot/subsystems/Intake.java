@@ -1,21 +1,12 @@
 package frc.robot.subsystems;
-
-import frc.robot.Robot;
-
-import com.ctre.phoenix6.signals.ForwardLimitSourceValue;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 public class Intake extends SubsystemBase {
     private final SparkMax intakeMotor;
@@ -25,7 +16,7 @@ public class Intake extends SubsystemBase {
     private static final double STALL_SPEED = 0.1;
     private static final double SLOW_REVERSE_SPEED = -0.65;
     public static SparkLimitSwitch limitSwitch;
-    public         SparkMaxConfig config;
+    public SparkMaxConfig config;
 
     public Intake() {
         intakeMotor = new SparkMax(INTAKE_MOTOR_ID, MotorType.kBrushed);
@@ -70,6 +61,7 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("Intake/ Speed",  intakeMotor.get());
         // This method will be called once per scheduler run
     }
 

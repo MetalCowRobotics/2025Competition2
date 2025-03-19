@@ -5,7 +5,6 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLimitSwitch;
-import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -23,8 +22,6 @@ public class Elevator extends SubsystemBase {
     private final SparkMax elevatorMotor;
     private final SparkMax elevatorFollowerMotor;
     private final SparkClosedLoopController closedLoopController;
-    private final SparkLimitSwitch bottomSwitch;
-    private final SparkLimitSwitch topSwitch;
     private double targetLocation = 0;
     private final Wrist wrist;
 
@@ -34,8 +31,6 @@ public class Elevator extends SubsystemBase {
         elevatorFollowerMotor = new SparkMax(ElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_ID, MotorType.kBrushless);
         
         closedLoopController = elevatorMotor.getClosedLoopController();
-        bottomSwitch = elevatorMotor.getReverseLimitSwitch();
-        topSwitch = elevatorMotor.getForwardLimitSwitch();
 
         // Configure the main elevator motor
         SparkMaxConfig config = new SparkMaxConfig();
@@ -167,16 +162,13 @@ public class Elevator extends SubsystemBase {
         }
 
         printDashboard();
-
-        SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
-        SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
     }
 
     public void printDashboard() {
-        SmartDashboard.putNumber("Elevator Position", elevatorMotor.getEncoder().getPosition());
-        SmartDashboard.putNumber("Elevator Target", targetLocation);
-        SmartDashboard.putBoolean("Elevator Bottom Switch", bottomSwitch.isPressed());
-        SmartDashboard.putBoolean("Elevator Top Switch", topSwitch.isPressed());
+        SmartDashboard.putNumber("Elevator/ Position", elevatorMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Elevator/ Target", targetLocation);
+        SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
     }
 
     public double getPosition() {  
