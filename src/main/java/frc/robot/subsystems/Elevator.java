@@ -149,10 +149,11 @@ public class Elevator extends SubsystemBase {
             elevatorMoveToDesired(); 
         }
         else if (getPosition() <= ElevatorConstants.L2_Distance && targetLocation >= ElevatorConstants.L2_Distance) {
-            if (wrist.isAtTarget()||wrist.getCurrentAngle()>0.4) {
+            if (wrist.isAtTarget()||wrist.getCurrentAngle()>0.883) {
                 elevatorMoveToDesired();
             } else {
                 wrist.resume();
+                elevatorMoveToL2();
             }
         }
         else if(getPosition() > ElevatorConstants.L2_Distance){
@@ -161,6 +162,7 @@ public class Elevator extends SubsystemBase {
 
             if(getPosition() <= ElevatorConstants.L2_Distance){
                 wrist.resume();
+                
             }
         }
 

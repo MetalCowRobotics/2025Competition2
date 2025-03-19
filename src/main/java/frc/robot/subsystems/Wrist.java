@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
@@ -26,44 +27,58 @@ public class Wrist extends SubsystemBase {
     private final double SAFE_ANGLE = 0.35;
     private boolean isInSafePosition = false;
 
-    private double kP = 0.1;
-    private double kI = 0;
-    private double kD = 0;
+    private double kP = 0.5;
+    private double kI = 0.001;
+    private double kD = 1.2;
 
     // private double kP = 0.28;
     // private double kI = 0.265;
     // private double kD = 0.27;
 
     SparkMaxConfig config;
+    AbsoluteEncoderConfig absoluteEncoderConfig;
 
     public Wrist() {
         wristMotor = new SparkMax(WristConstants.WRIST_MOTOR_ID, MotorType.kBrushless);
         closedLoopController = wristMotor.getClosedLoopController();
         absoluteEncoder = wristMotor.getAbsoluteEncoder();
+        absoluteEncoderConfig = new AbsoluteEncoderConfig();
+        absoluteEncoderConfig.inverted(true);
 
         this.config = new SparkMaxConfig();
         config.inverted(false)
-             .idleMode(IdleMode.kBrake)
-             .smartCurrentLimit(70)
+             .idleMode
+             (IdleMode.kBrake)
+             .smartCurrentLimit(40)
              .voltageCompensation(12);
-
-        config.softLimit.forwardSoftLimit( 0.75);
-
+  
+        config.softLimit.forwardSoftLimit( 0.97);
+        config.softLimit.reverseSoftLimit(0.58);
+        config.apply(absoluteEncoderConfig);
         config.closedLoop
+
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            .pid(kP, kI, kD)
-            .iZone(0.05)
-            .outputRange(-0.7, 0.7)
+            .p(kP)
+            // .i(kI)
+            // .d(kD)
+            // .minOutput(-0.01)
+            // .maxOutput(0.01)
+            .iZone(0.1)
+            .outputRange(-0.2,0.2)
             .maxMotion
             .maxVelocity(500)
             .maxAcceleration(500)
             .allowedClosedLoopError(.025);
 
         wristMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
+        // closedLoopController.setReference(absoluteEncoder.getPosition(), ControlType.kMAXMotionPositionControl);
+        this.desiredLocation = absoluteEncoder.getPosition();
     }
 
     public void setTargetLocation(double targetLocation) {
-        this.desiredLocation = Math.min(Math.max(targetLocation, 0), 0.75);
+        this.desiredLocation = Math.min(Math.max(targetLocation, 0.58), 0.97);
     }
 
     public void tuck() {
