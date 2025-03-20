@@ -18,11 +18,14 @@ public final class AlignmentConstants {
     public static final double POSITION_TOLERANCE_METERS = 0.015;
     public static final double ROTATION_TOLERANCE_DEGREES = 1.0;
 
+
+    //      new Pose2d(13.8927, 4.0260, Rotation2d.fromDegrees(180)),   // Tag 7
     // Offsets for alignment |Tag 7 Pose - Recorded Pose|
-    public static final double TAG_LEFT_OFFSET_X = 14.344-13.8927;
-    public static final double TAG_LEFT_OFFSET_Y = 4.0260-3.867;
-    public static final double TAG_RIGHT_OFFSET_X = 14.358-13.8927;
-    public static final double TAG_RIGHT_OFFSET_Y = 4.146-3.867;
+    public static final double TAG_LEFT_OFFSET_X = 14.352-13.8927;
+    public static final double TAG_LEFT_OFFSET_Y = 4.16-4.0260+0.04
+    ;
+    public static final double TAG_RIGHT_OFFSET_X = 14.355-13.8927;
+    public static final double TAG_RIGHT_OFFSET_Y = 4.0260-3.812-0.0254;
 
     // Holds All Target Positions
     public static final Pose2d[] LEFT_POSITIONS = calculateLeftTargetsWithOffset();

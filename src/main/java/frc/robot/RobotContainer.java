@@ -48,8 +48,8 @@ public class RobotContainer {
 
     /* Drive Request Objcets */
     private final SwerveRequest.FieldCentric fieldCentricDrive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.05)// Accounts for 10% deadband from the movement joystick
-            .withRotationalDeadband(MaxAngularRate * 0.05) // Accounts for 10% deadband from the rotational joystick
+            .withDeadband(MaxSpeed * 0.1)// Accounts for 10% deadband from the movement joystick
+            .withRotationalDeadband(MaxAngularRate * 0.1) // Accounts for 10% deadband from the rotational joystick
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors making it respond from raw inputs
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -143,8 +143,8 @@ public class RobotContainer {
                 );
 
                 if (driverController.rightTrigger().getAsBoolean()) {
-                    return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * CrawlMaxSpeed) 
-                                            .withVelocityY(-driverController.getLeftX() * CrawlMaxSpeed) 
+                    return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed / 2) 
+                                            .withVelocityY(-driverController.getLeftX() * MaxSpeed / 2) 
                                             .withRotationalRate(-driverController.getRightX() * CrawlMaxAngularRate);
 
                 } 

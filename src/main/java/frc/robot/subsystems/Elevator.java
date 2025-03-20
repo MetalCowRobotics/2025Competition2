@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.WristConstants;
 
 
 public class Elevator extends SubsystemBase {
@@ -144,14 +145,14 @@ public class Elevator extends SubsystemBase {
             elevatorMoveToDesired(); 
         }
         else if (getPosition() <= ElevatorConstants.L2_Distance && targetLocation >= ElevatorConstants.L2_Distance) {
-            if (wrist.isAtTarget()||wrist.getCurrentAngle()>0.883) {
+            if (wrist.isAtTarget()||wrist.getCurrentAngle()>WristConstants.Safe_Angle) {
                 elevatorMoveToDesired();
             } else {
                 wrist.resume();
                 elevatorMoveToL2();
             }
         }
-        else if(getPosition() > ElevatorConstants.L2_Distance){
+        else if(getPosition() > ElevatorConstants.L2_Distance && targetLocation <= ElevatorConstants.L2_Distance){
             elevatorMoveToDesired();
             wrist.holdLastTarget();
 
@@ -159,6 +160,11 @@ public class Elevator extends SubsystemBase {
                 wrist.resume();
                 
             }
+        }
+        
+        else if(getPosition() > ElevatorConstants.L2_Distance && targetLocation > ElevatorConstants.L2_Distance){
+            wrist.resume();
+            elevatorMoveToDesired();
         }
 
         printDashboard();

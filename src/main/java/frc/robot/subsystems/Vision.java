@@ -32,7 +32,7 @@ public class Vision extends SubsystemBase {
             SmartDashboard.putNumber("Limelight Fleft.pose.y", fleft.pose.getY());
             SmartDashboard.putNumber("Limelight Fleft Tag Count", fleft.tagCount);
 
-            doRejectUpdate = shouldRejectUpdate(fleft, 6.0);
+            doRejectUpdate = shouldRejectUpdate(fleft, 4.0);
 
             if (!doRejectUpdate) {
                 // Calculate standard deviations based on number of tags and distance
@@ -60,7 +60,7 @@ public class Vision extends SubsystemBase {
             SmartDashboard.putNumber("Limelight Fright.pose.y", fright.pose.getY());
             SmartDashboard.putNumber("Limelight Fright Tag Count", fright.tagCount);
 
-            doRejectUpdate = shouldRejectUpdate(fright, 6);
+            doRejectUpdate = shouldRejectUpdate(fright, 4);
 
             if (!doRejectUpdate) {
                 double[] stdDevs = calculateStdDevs(fright);

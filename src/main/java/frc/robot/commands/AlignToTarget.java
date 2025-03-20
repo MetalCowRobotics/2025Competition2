@@ -80,8 +80,10 @@ public class AlignToTarget extends Command {
             currentPose.getX(), 
             currentPose.getY()
         ).getDistance(
+            
             new Translation2d(
-                targetPose.getX(), 
+                
+            targetPose.getX(), 
                 targetPose.getY()
             )
         );

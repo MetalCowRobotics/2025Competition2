@@ -26,7 +26,7 @@ public class Wrist extends SubsystemBase {
     private boolean isInSafePosition = false;
 
     private double kP = 0.5;
-    private double kI = 0.008;
+    private double kI = 0.005;
     private double kD = 1.2;
 
     // private double kP = 0.28;
@@ -35,6 +35,7 @@ public class Wrist extends SubsystemBase {
 
     SparkMaxConfig config;
     AbsoluteEncoderConfig absoluteEncoderConfig;
+
 
     public Wrist() {
         wristMotor = new SparkMax(WristConstants.WRIST_MOTOR_ID, MotorType.kBrushless);
@@ -50,9 +51,10 @@ public class Wrist extends SubsystemBase {
              (IdleMode.kBrake)
              .smartCurrentLimit(40)
              .voltageCompensation(12);
-  
-        config.softLimit.forwardSoftLimit( 0.97);
-        config.softLimit.reverseSoftLimit(0.58);
+        config.softLimit.forwardSoftLimitEnabled(true);
+        config.softLimit.reverseSoftLimitEnabled(true);
+        config.softLimit.forwardSoftLimit( 0.669);
+        config.softLimit.reverseSoftLimit(0.223);
         config.apply(absoluteEncoderConfig);
         config.closedLoop
 
@@ -72,11 +74,11 @@ public class Wrist extends SubsystemBase {
 
 
         // closedLoopController.setReference(absoluteEncoder.getPosition(), ControlType.kMAXMotionPositionControl);
-        this.desiredLocation = 0.585;
+        this.desiredLocation = 0.25;
     }
 
     public void setTargetLocation(double targetLocation) {
-        this.desiredLocation = Math.min(Math.max(targetLocation, 0.58), 0.97);
+        this.desiredLocation = Math.min(Math.max(targetLocation, 0.223), 0.669);
     }
 
     public void tuck() {
