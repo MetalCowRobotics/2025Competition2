@@ -142,21 +142,21 @@ public class RobotContainer {
                     )
                 );
 
-                if (driverController.rightTrigger().getAsBoolean() || distanceToReef <= 0.4) {
+                if (driverController.rightTrigger().getAsBoolean()) {
                     return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * CrawlMaxSpeed) 
                                             .withVelocityY(-driverController.getLeftX() * CrawlMaxSpeed) 
                                             .withRotationalRate(-driverController.getRightX() * CrawlMaxAngularRate);
 
                 } 
-                // } else if(driverController.leftTrigger().getAsBoolean()){
-                //     return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed * 2) 
-                //     .withVelocityY(-driverController.getLeftX() * MaxSpeed * 2) 
-                //     .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
-                // }
+                else if(driverController.leftTrigger().getAsBoolean() && (Math.abs(driverController.getLeftY())>0.3 || Math.abs(driverController.getLeftX())>0.3)){
+                    return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed * 1.7) 
+                    .withVelocityY(-driverController.getLeftX() * MaxSpeed * 1.7) 
+                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
+                }
                 else {
                     return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) 
                                             .withVelocityY(-driverController.getLeftX() * MaxSpeed) 
-                                            .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
+                                            .withRotationalRate(-driverController.getRightX() * MaxAngularRate * 3/4);
                 }
             })
         );
