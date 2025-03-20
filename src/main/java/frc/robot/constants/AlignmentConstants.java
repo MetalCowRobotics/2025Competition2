@@ -152,6 +152,20 @@ public final class AlignmentConstants {
         
         return leftDistance < rightDistance ? leftTarget : rightTarget;
     }
+
+    // Method to print out the positions
+public static void printPositions() {
+    System.out.println("Left Positions:");
+    for (Pose2d position : LEFT_POSITIONS) {
+        System.out.println("X: " + position.getX() + ", Y: " + position.getY() + ", Rotation: " + position.getRotation().getDegrees() + " degrees");
+    }
+
+    System.out.println("\nRight Positions:");
+    for (Pose2d position : RIGHT_POSITIONS) {
+        System.out.println("X: " + position.getX() + ", Y: " + position.getY() + ", Rotation: " + position.getRotation().getDegrees() + " degrees");
+    }
+}
+
 } 
 
 

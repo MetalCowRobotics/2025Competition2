@@ -124,6 +124,8 @@ public class RobotContainer {
         ));
 
         configureBindings();
+
+        AlignmentConstants.printPositions();
     }
 
     private void configureBindings() {
