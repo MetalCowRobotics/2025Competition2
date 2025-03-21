@@ -15,18 +15,25 @@
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Go To L4"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.4
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Go To L4"
+                      }
+                    }
+                  ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.15
           }
         },
         {
@@ -38,7 +45,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.35
+            "waitTime": 0.7
           }
         },
         {
@@ -58,7 +65,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.8
+                        "waitTime": 0.4
                       }
                     },
                     {
@@ -90,7 +97,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.1
+                        "waitTime": 1.4
                       }
                     },
                     {
@@ -106,12 +113,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Reverse Intake"
@@ -120,7 +121,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.35
+            "waitTime": 0.7
           }
         },
         {
@@ -140,7 +141,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.6
+                        "waitTime": 0.4
                       }
                     },
                     {
@@ -172,25 +173,19 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.1
+                        "waitTime": 0.2
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Go To L2"
                       }
                     }
                   ]
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Go To L4"
-                }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.1
           }
         },
         {
@@ -202,7 +197,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.35
+            "waitTime": 0.7
           }
         }
       ]
