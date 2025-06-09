@@ -16,19 +16,9 @@ public final class ArmCommands {
         this.intake = intake;
     }
 
-    // L2 Position Command
-    public Command goToL2() {
-        return elevator.goToL2Command().alongWith(wrist.goToL3Command());
-    }
-
-    // L3 Position Command
-    public Command goToL3() {
-        return elevator.goToL3Command().alongWith(wrist.goToL3Command());
-    }
-
-    // L4 Position Command
-    public Command goToL4() {
-        return elevator.goToL4Command().alongWith(wrist.goToL4Command());
+    // Rest Position Command
+    public Command goToRest() {
+        return elevator.goToRestCommand().alongWith(wrist.goToRestCommand()).andThen(intake.stopIntakeCommand());
     }
 
     // Source Position with Intake Command
@@ -36,9 +26,28 @@ public final class ArmCommands {
         return elevator.goToSourceCommand().alongWith(wrist.goToSourceCommand()).andThen(intake.startIntakeCommand());
     }
 
-    // Rest Position Command
-    public Command goToRest() {
-        return elevator.goToRestCommand().alongWith(wrist.goToRestCommand());
+    // L2 Position Command
+    public Command goToL2() {
+        return elevator.goToL2Command().alongWith(wrist.goToL3Command()).andThen(intake.stallIntakeCommand());
+    }
+
+    // L3 Position Command
+    public Command goToL3() {
+        return elevator.goToL3Command().alongWith(wrist.goToL3Command()).andThen(intake.stallIntakeCommand());
+    }
+
+    // L4 Position Command
+    public Command goToL4() {
+        return elevator.goToL4Command().alongWith(wrist.goToL4Command()).andThen(intake.stallIntakeCommand());
+    }
+
+    // Alage Position Commands
+    public Command goToAlgaeL3() {
+        return elevator.goToAlgaeL3Command().alongWith(wrist.goToAlage()).andThen(intake.slowReverseIntakeCommand());
+    }
+
+    public Command goToAlgaeL2() {
+        return elevator.goToAlgaeL2Command().alongWith(wrist.goToAlage()).andThen(intake.slowReverseIntakeCommand());
     }
 
     // Stop All Command

@@ -5,7 +5,6 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLimitSwitch;
-import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -17,27 +16,28 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.WristConstants;
+
 
 public class Elevator extends SubsystemBase {
     private final SparkMax elevatorMotor;
+    private final SparkMax elevatorFollowerMotor;
     private final SparkClosedLoopController closedLoopController;
-    private final SparkLimitSwitch bottomSwitch;
-    private final SparkLimitSwitch topSwitch;
     private double targetLocation = 0;
     private final Wrist wrist;
-    private double desiredTarget = 0;
 
     public Elevator(Wrist wrist) {
         this.wrist = wrist;
         elevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
+        elevatorFollowerMotor = new SparkMax(ElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_ID, MotorType.kBrushless);
+        
         closedLoopController = elevatorMotor.getClosedLoopController();
-        bottomSwitch = elevatorMotor.getReverseLimitSwitch();
-        topSwitch = elevatorMotor.getForwardLimitSwitch();
 
+        // Configure the main elevator motor
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true);
-        config.idleMode(IdleMode.kCoast)
-             .smartCurrentLimit(50)
+        config.inverted(true);  // Main motor is inverted
+        config.idleMode(IdleMode.kBrake)
+             .smartCurrentLimit(40)
              .voltageCompensation(12);
 
         config.limitSwitch
@@ -48,31 +48,69 @@ public class Elevator extends SubsystemBase {
 
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(1)
-            .d(0.01)
-            .i(0.004)
-            .iZone(0.7)
-            .outputRange(-0.5, 0.5)
+            .p(0.6)
+            // .d(0.001)
+            .i(0.002)
+           
             .maxMotion
             .maxVelocity(6000)
-            .maxAcceleration(4000)
-            .allowedClosedLoopError(0.25);
+            .maxAcceleration(5000)
+            .allowedClosedLoopError(0.5);
 
         elevatorMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        // Configure the follower motor
+        SparkMaxConfig followerConfig = new SparkMaxConfig();
+        followerConfig.inverted(false); 
+        followerConfig.follow(15, true); // Changed to false since main motor is inverted
+        followerConfig.idleMode(IdleMode.kCoast)
+                     .smartCurrentLimit(40)
+                     .voltageCompensation(12);
+        elevatorFollowerMotor.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        followerConfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .p(0.6)
+            .i(0.002)
+            // .d(0.001)
+           
+            .outputRange(-1, 1)
+            .maxMotion
+            .maxVelocity(6000)
+            .maxAcceleration(5000)
+            .allowedClosedLoopError(0.5);
+        
+        // Set follower motor to follow the main motor in opposite direction
+        elevatorFollowerMotor.isFollower(); // true inverts the following direction
+       
         zeroEncoder();
     }
 
-    public void setTargetLocation(double targetLocation) {
-        this.desiredTarget = targetLocation;
+    public Command setUp() {
+        return this.run(() -> elevatorMotor.set(0.2));
     }
 
-    private void zeroEncoder() {
+    public Command setDown() {
+        return this.run(() -> elevatorMotor.set(-0.2));
+    }
+
+    public void setTargetLocation(double targetLocation) {
+        this.targetLocation = targetLocation;
+    }
+
+    public void zeroEncoder() {
         elevatorMotor.getEncoder().setPosition(0);
     }
 
     // Command wrappers for the preset positions
     public Command goToL4Command() {
         return this.runOnce(() -> setTargetLocation(ElevatorConstants.L4_Distance));
+    }
+
+    public Command goToAlgaeL3Command() {
+        return this.runOnce(() -> setTargetLocation(ElevatorConstants.AlgaeL3_Distance));
+    }
+    public Command goToAlgaeL2Command() {
+        return this.runOnce(() -> setTargetLocation(ElevatorConstants.AlgaeL2_Distance));
     }
 
     public Command goToL3Command() {
@@ -91,49 +129,55 @@ public class Elevator extends SubsystemBase {
         return this.runOnce(() -> setTargetLocation(ElevatorConstants.resetPos));
     }
 
+    public void elevatorMoveToDesired(){
+        closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+    }
+
+    public void elevatorMoveToL2(){
+        closedLoopController.setReference(ElevatorConstants.L2_Distance, ControlType.kMAXMotionPositionControl);
+    }
+
+    /* Motion Planning Logic: */ 
     @Override
     public void periodic() {
-        // If elevator at or below L3 but wanting to go to L4, make sure wrist is tucked in (>=11.5)
-        // If elevator is at L4 but wanting to go below L4, wait until wrist is tucked in (>= 11.5)
-        boolean atOrBelowL3 = (getPosition() - ElevatorConstants.L3_Distance) < 3.0;
-
-        if (desiredTarget > ElevatorConstants.L3_Distance && atOrBelowL3) {
-            if (wrist.isAtSafeAngle()) {
-                // wrist tucked so we can to L4
-                this.targetLocation = desiredTarget;
-                closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
-                wrist.resume();
-            } else {
-                // wanting to go to L4 but wrist is out so wait for next periodic
-                wrist.tuck();
-            }
-        } else if (desiredTarget <= ElevatorConstants.L4_Distance && !atOrBelowL3) {
-            if (wrist.isAtSafeAngle()) {
-                this.targetLocation = desiredTarget;
-                closedLoopController.setReference(desiredTarget, ControlType.kMAXMotionPositionControl);
-                wrist.resume();
-            } else {
-                // wait until wrist tucked before lowering from L4 to L3 or below
-                wrist.tuck();
-            }
-        } else {
-            this.targetLocation = desiredTarget;
-            closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+        if (getPosition() <= ElevatorConstants.L2_Distance && targetLocation < ElevatorConstants.L2_Distance) {
             wrist.resume();
+            elevatorMoveToDesired(); 
+        }
+        else if (getPosition() <= ElevatorConstants.L2_Distance && targetLocation >= ElevatorConstants.L2_Distance) {
+            if (wrist.isAtTarget()||wrist.getCurrentAngle()>WristConstants.Safe_Angle) {
+                elevatorMoveToDesired();
+            } else {
+                wrist.resume();
+                elevatorMoveToL2();
+            }
+        }
+        else if(getPosition() > ElevatorConstants.L2_Distance && targetLocation <= ElevatorConstants.L2_Distance){
+            elevatorMoveToDesired();
+            wrist.holdLastTarget();
+
+            if(getPosition() <= ElevatorConstants.L2_Distance){
+                wrist.resume();
+                
+            }
+        }
+        
+        else if(getPosition() > ElevatorConstants.L2_Distance && targetLocation > ElevatorConstants.L2_Distance){
+            wrist.resume();
+            elevatorMoveToDesired();
         }
 
         printDashboard();
     }
 
     public void printDashboard() {
-        SmartDashboard.putNumber("Elevator Position", elevatorMotor.getEncoder().getPosition());
-        SmartDashboard.putNumber("Elevator Target", targetLocation);
-        SmartDashboard.putNumber("Elevator Desired Target", desiredTarget);
-        SmartDashboard.putBoolean("Elevator Bottom Switch", bottomSwitch.isPressed());
-        SmartDashboard.putBoolean("Elevator Top Switch", topSwitch.isPressed());
+        SmartDashboard.putNumber("Elevator/ Position", elevatorMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Elevator/ Target", targetLocation);
+        SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
     }
 
-    private double getPosition() {  
+    public double getPosition() {  
         return elevatorMotor.getEncoder().getPosition();
     }
 } 

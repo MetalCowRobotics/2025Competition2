@@ -17,6 +17,8 @@ public class Vision extends SubsystemBase {
     @Override
     public void periodic() {
         updatePoseEstimates();
+
+        SmartDashboard.putString("Left Limelight", LimelightHelpers.getLimelightNTString(getSubsystem(), getName()));
     }
 
     private void updatePoseEstimates() {
