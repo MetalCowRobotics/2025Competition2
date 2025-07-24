@@ -19,16 +19,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Climb extends SubsystemBase {
     private final SparkMax climbMotor;
     private final SparkClosedLoopController closedLoopController;
-    private final DigitalInput limitSwitch;
     private double targetPosition = 0;
-    private static final int MOTOR_ID = 18;
+    private static final int MOTOR_ID = 21;
     private static final double CLIMB_SPEED = 1; // 30% speed
     private static final double ADDITIONAL_ROTATIONS = 330;
 
     public Climb() {
         climbMotor = new SparkMax(MOTOR_ID, MotorType.kBrushless);
         closedLoopController = climbMotor.getClosedLoopController();
-        limitSwitch = new DigitalInput(0); // DIO port 0
 
         SparkMaxConfig config = new SparkMaxConfig();
         config.inverted(false);
@@ -74,26 +72,9 @@ public class Climb extends SubsystemBase {
         );
     }
 
-    // public Command runClimb(){
-    //     return this.runOnce(() -> {climbMOtor.set(CLIMB_SPEED)})
-    // }
-
-    // public Command climbAdditionalCommand() {
-
-    //     return this.runOnce(() -> {
-    //         targetPosition = ADDITIONAL_ROTATIONS;
-    //         closedLoopController.setReference(targetPosition, ControlType.kMAXMotionPositionControl);
-    //     });
-    // }
-
-    private void zeroEncoder() {
-        climbMotor.getEncoder().setPosition(0);
-    }
-
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Climb Position", climbMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("Climb Target", targetPosition);
-        SmartDashboard.putBoolean("Climb Limit Switch", !limitSwitch.get());
     }
 } 
