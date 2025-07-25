@@ -1,9 +1,9 @@
 package frc.robot.constants;
 
 public final class WristConstants {
-    public static final double L4_Angle = 13;
-    public static final double L3_Angle = 5.3;
-    public static final double Source_Angle = 5.3;
+    public static final double L4_Angle = 7.4;
+    public static final double L3_Angle = 7;
+    public static final double Source_Angle = 4.2;
     public static final double Rest_Angle = 0;
 
     // Motor configuration

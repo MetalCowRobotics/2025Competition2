@@ -22,15 +22,13 @@ public class Wrist extends SubsystemBase {
     private final SparkClosedLoopController closedLoopController;
     private double targetLocation = 0;
     private double desiredLocation = 0;
-    private final double SAFE_ANGLE = 11.5;
-    private boolean isInSafePosition = false;
 
     public Wrist() {
         wristMotor = new SparkMax(WristConstants.WRIST_MOTOR_ID, MotorType.kBrushless);
         closedLoopController = wristMotor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true);
+        config.inverted(false);
         config.idleMode(IdleMode.kCoast)
              .smartCurrentLimit(50)
              .voltageCompensation(12);
@@ -53,10 +51,6 @@ public class Wrist extends SubsystemBase {
 
     public void setTargetLocation(double targetLocation) {
         this.desiredLocation = targetLocation;
-    }
-
-    public void tuck() {
-        closedLoopController.setReference(WristConstants.L4_Angle, ControlType.kMAXMotionPositionControl);
     }
 
     public void resume() {
@@ -87,19 +81,11 @@ public class Wrist extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Update safety status
-        isInSafePosition = getCurrentAngle() >= SAFE_ANGLE;
-
+            resume();
         SmartDashboard.putNumber("Wrist Encoder Reading", wristMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("Wrist Target Location", targetLocation);
-        SmartDashboard.putBoolean("Wrist Safe Position", isInSafePosition);
     }
 
     public double getCurrentAngle() {
         return wristMotor.getEncoder().getPosition();
-    }
-
-    public boolean isAtSafeAngle() {
-        return isInSafePosition;
-    }
-} 
+    }}

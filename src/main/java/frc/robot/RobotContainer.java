@@ -52,7 +52,7 @@ public class RobotContainer {
 
     private final Intake intake = new Intake();
     private final Wrist wrist = new Wrist();
-    private final Elevator elevator = new Elevator(wrist);
+    private final Elevator elevator = new Elevator();
 
     private final ArmCommands armCommands;
 
@@ -140,7 +140,7 @@ public class RobotContainer {
         
         // Reverse intake - toggle style
         operatorController.rightBumper().onTrue(
-                intake.stopIntakeCommand()
+                intake.stopIntakeCommand().alongWith(armCommands.goToRest())
         );
 
         drivetrain.registerTelemetry(logger::telemeterize);

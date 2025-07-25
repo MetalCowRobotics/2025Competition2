@@ -1,17 +1,15 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLimitSwitch;
-import com.revrobotics.spark.SparkLowLevel;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.LimitSwitchConfig.Type;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.StrictFollower;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,121 +17,113 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase {
-    private final SparkMax elevatorMotor;
-    private final SparkClosedLoopController closedLoopController;
-    private final SparkLimitSwitch bottomSwitch;
-    private final SparkLimitSwitch topSwitch;
-    private double targetLocation = 0;
-    private final Wrist wrist;
-    private double desiredTarget = 0;
+    private final TalonFX leaderMotor;
+    private final TalonFX followerMotor;
+    private final MotionMagicVoltage motionMagicRequest;
+    private double targetPosition = 0;
+    private static final double METERS_PER_ROTATION = 0.1595; // π * 0.0508m (circumference of 2-inch sprocket)
 
-    public Elevator(Wrist wrist) {
-        this.wrist = wrist;
-        elevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
-        closedLoopController = elevatorMotor.getClosedLoopController();
-        bottomSwitch = elevatorMotor.getReverseLimitSwitch();
-        topSwitch = elevatorMotor.getForwardLimitSwitch();
+    public Elevator() {
+        leaderMotor = new TalonFX(ElevatorConstants.LEADER_MOTOR_ID);
+        followerMotor = new TalonFX(ElevatorConstants.FOLLOWER_MOTOR_ID);
+        motionMagicRequest = new MotionMagicVoltage(0);
 
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true);
-        config.idleMode(IdleMode.kCoast)
-             .smartCurrentLimit(50)
-             .voltageCompensation(12);
-
-        config.limitSwitch
-            .reverseLimitSwitchEnabled(true)
-            .reverseLimitSwitchType(Type.kNormallyOpen)
-            .forwardLimitSwitchEnabled(true)
-            .forwardLimitSwitchType(Type.kNormallyOpen);
-
-        config.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(1)
-            .d(0.01)
-            .i(0.004)
-            .iZone(0.7)
-            .outputRange(-0.5, 0.5)
-            .maxMotion
-            .maxVelocity(6000)
-            .maxAcceleration(4000)
-            .allowedClosedLoopError(0.25);
-
-        elevatorMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        zeroEncoder();
+        configureMotors();
     }
 
-    public void setTargetLocation(double targetLocation) {
-        this.desiredTarget = targetLocation;
+    private void configureMotors() {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+
+        // Configure gear ratio and mechanical conversion
+        FeedbackConfigs feedback = config.Feedback;
+        feedback.SensorToMechanismRatio = 5.0; // 5:1 gear reduction
+
+        // Configure Motion Magic
+        MotionMagicConfigs mm = config.MotionMagic;
+        mm.withMotionMagicCruiseVelocity(39.27)
+          .withMotionMagicAcceleration(59.54)
+          .withMotionMagicJerk(100.08);
+
+        // Configure PID values
+        Slot0Configs slot0 = config.Slot0;
+        slot0.kS = 0.25;
+        slot0.kV = 0.02;
+        slot0.kA = 0.01;
+        slot0.kP = 10;
+        slot0.kI = 0;
+        slot0.kD = 1.0;
+
+        // Set to brake mode
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        // Configure leader motor
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        StatusCode status = StatusCode.StatusCodeNotInitialized;
+        for (int i = 0; i < 5; ++i) {
+            status = leaderMotor.getConfigurator().apply(config);
+            if (status.isOK()) break;
+        }
+        if (!status.isOK()) {
+            System.out.println("Could not configure leader motor. Error: " + status.toString());
+        }
+
+        // Configure follower motor
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        status = StatusCode.StatusCodeNotInitialized;
+        for (int i = 0; i < 5; ++i) {
+            status = followerMotor.getConfigurator().apply(config);
+            if (status.isOK()) break;
+        }
+        if (!status.isOK()) {
+            System.out.println("Could not configure follower motor. Error: " + status.toString());
+        }
+
+        // Set follower to follow leader
+        followerMotor.setControl(new StrictFollower(ElevatorConstants.LEADER_MOTOR_ID));
     }
 
-    private void zeroEncoder() {
-        elevatorMotor.getEncoder().setPosition(0);
+    public void setTargetPosition(double positionMeters) {
+        targetPosition = positionMeters;
+        leaderMotor.setControl(motionMagicRequest.withPosition(positionMeters / METERS_PER_ROTATION).withSlot(0));
     }
 
-    // Command wrappers for the preset positions
+    // Command wrappers for preset positions
     public Command goToL4Command() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.L4_Distance));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.L4_Distance));
     }
 
     public Command goToL3Command() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.L3_Distance));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.L3_Distance));
     }
 
     public Command goToL2Command() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.L2_Distance));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.L2_Distance));
     }
 
     public Command goToSourceCommand() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.Source_Distance));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.Source_Distance));
     }
 
     public Command goToRestCommand() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.resetPos));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.resetPos));
     }
 
     @Override
     public void periodic() {
-        // If elevator at or below L3 but wanting to go to L4, make sure wrist is tucked in (>=11.5)
-        // If elevator is at L4 but wanting to go below L4, wait until wrist is tucked in (>= 11.5)
-        boolean atOrBelowL3 = (getPosition() - ElevatorConstants.L3_Distance) < 3.0;
-
-        if (desiredTarget > ElevatorConstants.L3_Distance && atOrBelowL3) {
-            if (wrist.isAtSafeAngle()) {
-                // wrist tucked so we can to L4
-                this.targetLocation = desiredTarget;
-                closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
-                wrist.resume();
-            } else {
-                // wanting to go to L4 but wrist is out so wait for next periodic
-                wrist.tuck();
-            }
-        } else if (desiredTarget <= ElevatorConstants.L4_Distance && !atOrBelowL3) {
-            if (wrist.isAtSafeAngle()) {
-                this.targetLocation = desiredTarget;
-                closedLoopController.setReference(desiredTarget, ControlType.kMAXMotionPositionControl);
-                wrist.resume();
-            } else {
-                // wait until wrist tucked before lowering from L4 to L3 or below
-                wrist.tuck();
-            }
-        } else {
-            this.targetLocation = desiredTarget;
-            closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
-            wrist.resume();
-        }
-
-        printDashboard();
+        updateDashboard();
     }
 
-    public void printDashboard() {
-        SmartDashboard.putNumber("Elevator Position", elevatorMotor.getEncoder().getPosition());
-        SmartDashboard.putNumber("Elevator Target", targetLocation);
-        SmartDashboard.putNumber("Elevator Desired Target", desiredTarget);
-        SmartDashboard.putBoolean("Elevator Bottom Switch", bottomSwitch.isPressed());
-        SmartDashboard.putBoolean("Elevator Top Switch", topSwitch.isPressed());
+    private void updateDashboard() {
+        SmartDashboard.putNumber("Elevator Position (m)", getPositionMeters());
+        SmartDashboard.putNumber("Elevator Target (m)", targetPosition);
+        SmartDashboard.putNumber("Elevator Velocity (m/s)", getVelocityMetersPerSecond());
     }
 
-    private double getPosition() {  
-        return elevatorMotor.getEncoder().getPosition();
+    public double getPositionMeters() {
+        return leaderMotor.getRotorPosition().getValueAsDouble() * METERS_PER_ROTATION;
+    }
+
+    public double getVelocityMetersPerSecond() {
+        return leaderMotor.getRotorVelocity().getValueAsDouble() * METERS_PER_ROTATION;
     }
 } 
