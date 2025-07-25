@@ -20,7 +20,7 @@ public class Climb extends SubsystemBase {
     private final SparkMax climbMotor;
     private final SparkClosedLoopController closedLoopController;
     private double targetPosition = 0;
-    private static final int MOTOR_ID = 21;
+    private static final int MOTOR_ID = 10;
     private static final double CLIMB_SPEED = 1; // 30% speed
     private static final double ADDITIONAL_ROTATIONS = 330;
 
@@ -40,7 +40,7 @@ public class Climb extends SubsystemBase {
             .d(0)
             .i(0)
             .outputRange(-0, 1)
-            .maxMotion
+            .maxMotionr
             .maxVelocity(5000)
             .maxAcceleration(2000)
             .allowedClosedLoopError(0.1);
