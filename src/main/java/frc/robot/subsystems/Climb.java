@@ -40,7 +40,7 @@ public class Climb extends SubsystemBase {
             .d(0)
             .i(0)
             .outputRange(-0, 1)
-            .maxMotionr
+            .maxMotion
             .maxVelocity(5000)
             .maxAcceleration(2000)
             .allowedClosedLoopError(0.1);
