@@ -33,7 +33,7 @@ public final class ArmCommands {
 
     // Source Position with Intake Command
     public Command goToSource() {
-        return elevator.goToSourceCommand().alongWith(wrist.goToSourceCommand()).andThen(intake.startIntakeCommand());
+        return elevator.goToSourceCommand().alongWith(wrist.goToSourceCommand()).andThen(intake.IntakeCommand());
     }
 
     // Rest Position Command

@@ -38,10 +38,10 @@ public class Robot extends TimedRobot {
       double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
       var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-fleft");
       var llRMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-fright");
-      if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
+      if (llMeasurement != null && llMeasurement.tagCount > 2 && llMeasurement.tagCount != 12 && llMeasurement.tagCount != 13 && Math.abs(omegaRps) < 2.0) {
         m_robotContainer.drivetrain.addVisionMeasurement(llMeasurement.pose, llMeasurement.timestampSeconds);
       }
-      if (llRMeasurement != null && llRMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
+      if (llRMeasurement != null && llRMeasurement.tagCount > 2 && llRMeasurement.tagCount != 12 && llRMeasurement.tagCount != 13 && Math.abs(omegaRps) < 2.0) {
         m_robotContainer.drivetrain.addVisionMeasurement(llRMeasurement.pose, llRMeasurement.timestampSeconds);
       }
     }

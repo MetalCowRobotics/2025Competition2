@@ -22,6 +22,7 @@ public class Wrist extends SubsystemBase {
     private final SparkClosedLoopController closedLoopController;
     private double targetLocation = 0;
     private double desiredLocation = 0;
+    private boolean isManualControl = false;
 
     public Wrist() {
         wristMotor = new SparkMax(WristConstants.WRIST_MOTOR_ID, MotorType.kBrushless);
@@ -50,16 +51,47 @@ public class Wrist extends SubsystemBase {
     }
 
     public void setTargetLocation(double targetLocation) {
-        this.desiredLocation = targetLocation;
+        if (!isManualControl) {
+            this.desiredLocation = targetLocation;
+        }
+    }
+
+    public void setManualControl(double speed) {
+        if (isManualControl) {
+            // Apply a deadband and limit the speed
+            if (Math.abs(speed) < 0.1) {
+                speed = 0;
+            }
+            // Limit the speed to 30% for safety
+            speed = speed * 0.3;
+            wristMotor.set(speed);
+        }
+    }
+
+    public void toggleManualControl() {
+        isManualControl = !isManualControl;
+        if (!isManualControl) {
+            // When switching back to preset mode, maintain current position
+            desiredLocation = getCurrentAngle();
+            targetLocation = desiredLocation;
+        }
+    }
+
+    public boolean isInManualControl() {
+        return isManualControl;
     }
 
     public void resume() {
-        this.targetLocation = this.desiredLocation;
-        closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+        if (!isManualControl) {
+            this.targetLocation = this.desiredLocation;
+            closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+        }
     }
 
-    private void zeroEncoder() {
+    public void zeroEncoder() {
         wristMotor.getEncoder().setPosition(0);
+        targetLocation = 0;
+        desiredLocation = 0;
     }
 
     // Command wrappers for the preset positions
@@ -79,11 +111,20 @@ public class Wrist extends SubsystemBase {
         return this.runOnce(() -> setTargetLocation(WristConstants.Rest_Angle));
     }
 
+    public Command zeroEncoderCommand() {
+        return this.runOnce(this::zeroEncoder);
+    }
+
+    public Command toggleManualControlCommand() {
+        return this.runOnce(this::toggleManualControl);
+    }
+
     @Override
     public void periodic() {
-            resume();
+        resume();
         SmartDashboard.putNumber("Wrist Encoder Reading", wristMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("Wrist Target Location", targetLocation);
+        SmartDashboard.putBoolean("Wrist Manual Control", isManualControl);
     }
 
     public double getCurrentAngle() {

@@ -4,27 +4,32 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.AlignToTarget;
+import frc.robot.commands.ArmCommands;
+import frc.robot.commands.LEDDefaultCommand;
+import frc.robot.constants.AlignmentConstants;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Vision;
-import frc.robot.constants.AlignmentConstants;
-import frc.robot.commands.AlignToTarget;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Elevator;
-import frc.robot.commands.ArmCommands;
-import com.pathplanner.lib.auto.NamedCommands;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.commands.LEDDefaultCommand;
+import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Wrist;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -55,6 +60,7 @@ public class RobotContainer {
     private final Elevator elevator = new Elevator();
 
     private final ArmCommands armCommands;
+    private final SendableChooser<String> autoLocationChooser;
 
     private final LEDSubsystem ledSubsystem = new LEDSubsystem(0);
 
@@ -78,6 +84,12 @@ public class RobotContainer {
         
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
+        autoLocationChooser = new SendableChooser<>();
+        autoLocationChooser.addOption("Left", new String("Left"));
+        autoLocationChooser.addOption("Center", new String("Center"));
+        autoLocationChooser.addOption("Right", new String("Right"));
+
+        SmartDashboard.putData("Auto Location", autoLocationChooser);
 
         // Set default command for LEDs
         ledSubsystem.setDefaultCommand(new LEDDefaultCommand(
@@ -102,9 +114,19 @@ public class RobotContainer {
             )
         );
 
+        // Manual wrist control using operator right joystick Y-axis
+        wrist.setDefaultCommand(
+            wrist.run(() -> wrist.setManualControl(-operatorController.getRightY()))
+        );
+
+        // Toggle between manual and preset control with back button
+        operatorController.back().onTrue(wrist.toggleManualControlCommand());
+
+        // Zero encoder when start button is pressed
+        operatorController.start().onTrue(wrist.zeroEncoderCommand());
+
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
 
-        
         // X button for left side targets with LED feedback
         joystick.x().whileTrue(
             new AlignToTarget(drivetrain, () -> {
@@ -129,6 +151,7 @@ public class RobotContainer {
         );
 
         // Combined elevator and wrist controls for all positions
+        // These will only work when not in manual control mode
         operatorController.a().onTrue(armCommands.goToL2());     // L2 position on A
         operatorController.b().onTrue(armCommands.goToL3());     // L3 position on B
         operatorController.y().onTrue(armCommands.goToL4());     // L4 position on Y
@@ -147,7 +170,15 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        /* Run the path selected from the auto chooser */
-        return autoChooser.getSelected();
+        try{
+            if(autoLocationChooser.getSelected().equals("Right")){
+                return new PathPlannerAuto(autoChooser.getSelected().getName(), true);
+            }else{
+                return new PathPlannerAuto(autoChooser.getSelected().getName(), false);
+            }
+        }catch(Exception e){
+                DriverStation.reportError("PathPlanner ERROR: " + e.getMessage(), e.getStackTrace());
+                return null;
+        }
     }
 }

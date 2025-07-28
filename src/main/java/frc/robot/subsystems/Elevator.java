@@ -49,7 +49,7 @@ public class Elevator extends SubsystemBase {
         slot0.kS = 0.25;
         slot0.kV = 0.02;
         slot0.kA = 0.01;
-        slot0.kP = 10;
+        slot0.kP = 12;
         slot0.kI = 0;
         slot0.kD = 1.0;
 
