@@ -204,6 +204,10 @@ public class RobotContainer {
         operatorController.x().onTrue(armCommands.goToSource()); // Source position on X
         operatorController.b().onTrue(armCommands.goToL3());     // L4 position on Y
         operatorController.a().onTrue(armCommands.goToL2());
+        // Reverse intake - toggle style
+        operatorController.rightBumper().onTrue(
+                intake.stopIntakeCommand().alongWith(armCommands.goToRest())
+        );
 
         operatorController.rightTrigger().onTrue(armCommands.goToAlgaeL2()); // Remove algae from L2 on Right Trigger
         operatorController.leftTrigger().onTrue(armCommands.goToAlgaeL3()); // Remove algae from L3 on Right Trigger

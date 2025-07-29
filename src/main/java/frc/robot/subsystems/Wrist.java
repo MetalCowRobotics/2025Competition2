@@ -81,10 +81,6 @@ public class Wrist extends SubsystemBase {
         this.desiredLocation = Math.min(Math.max(targetLocation, 0.223), 0.669);
     }
 
-    public void tuck() {
-        closedLoopController.setReference(WristConstants.L4_Angle, ControlType.kMAXMotionPositionControl);
-    }
-
     public void resume() {
         this.targetLocation = this.desiredLocation;
         closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);

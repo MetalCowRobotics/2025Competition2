@@ -101,9 +101,9 @@ public class Elevator extends SubsystemBase {
         elevatorMotor.getEncoder().setPosition(0);
     }
 
-    // Command wrappers for the preset positions
+    // Command wrappers for preset positions
     public Command goToL4Command() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.L4_Distance));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.L4_Distance));
     }
 
     public Command goToAlgaeL3Command() {
@@ -114,19 +114,19 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command goToL3Command() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.L3_Distance));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.L3_Distance));
     }
 
     public Command goToL2Command() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.L2_Distance));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.L2_Distance));
     }
 
     public Command goToSourceCommand() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.Source_Distance));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.Source_Distance));
     }
 
     public Command goToRestCommand() {
-        return this.runOnce(() -> setTargetLocation(ElevatorConstants.resetPos));
+        return this.runOnce(() -> setTargetPosition(ElevatorConstants.resetPos));
     }
 
     public void elevatorMoveToDesired(){
@@ -166,8 +166,13 @@ public class Elevator extends SubsystemBase {
             wrist.resume();
             elevatorMoveToDesired();
         }
+    }
 
-        printDashboard();
+
+    private void updateDashboard() {
+        SmartDashboard.putNumber("Elevator Position (m)", getPositionMeters());
+        SmartDashboard.putNumber("Elevator Target (m)", targetPosition);
+        SmartDashboard.putNumber("Elevator Velocity (m/s)", getVelocityMetersPerSecond());
     }
 
     public void printDashboard() {
