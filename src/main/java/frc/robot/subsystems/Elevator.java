@@ -1,95 +1,116 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.StrictFollower;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLimitSwitch;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.LimitSwitchConfig.Type;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.WristConstants;
+
 
 public class Elevator extends SubsystemBase {
-    private final TalonFX leaderMotor;
-    private final TalonFX followerMotor;
-    private final MotionMagicVoltage motionMagicRequest;
-    private double targetPosition = 0;
-    private static final double METERS_PER_ROTATION = 0.1595; // π * 0.0508m (circumference of 2-inch sprocket)
+    private final SparkMax elevatorMotor;
+    private final SparkMax elevatorFollowerMotor;
+    private final SparkClosedLoopController closedLoopController;
+    private double targetLocation = 0;
+    private final Wrist wrist;
 
-    public Elevator() {
-        leaderMotor = new TalonFX(ElevatorConstants.LEADER_MOTOR_ID);
-        followerMotor = new TalonFX(ElevatorConstants.FOLLOWER_MOTOR_ID);
-        motionMagicRequest = new MotionMagicVoltage(0);
+    public Elevator(Wrist wrist) {
+        this.wrist = wrist;
+        elevatorMotor = new SparkMax(ElevatorConstants.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
+        elevatorFollowerMotor = new SparkMax(ElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_ID, MotorType.kBrushless);
+        
+        closedLoopController = elevatorMotor.getClosedLoopController();
 
-        configureMotors();
+        // Configure the main elevator motor
+        SparkMaxConfig config = new SparkMaxConfig();
+        config.inverted(true);  // Main motor is inverted
+        config.idleMode(IdleMode.kBrake)
+             .smartCurrentLimit(40)
+             .voltageCompensation(12);
+
+        config.limitSwitch
+            .reverseLimitSwitchEnabled(true)
+            .reverseLimitSwitchType(Type.kNormallyOpen)
+            .forwardLimitSwitchEnabled(true)
+            .forwardLimitSwitchType(Type.kNormallyOpen);
+
+        config.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .p(0.6)
+            // .d(0.001)
+            .i(0.002)
+           
+            .maxMotion
+            .maxVelocity(6000)
+            .maxAcceleration(5000)
+            .allowedClosedLoopError(0.5);
+
+        elevatorMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        // Configure the follower motor
+        SparkMaxConfig followerConfig = new SparkMaxConfig();
+        followerConfig.inverted(false); 
+        followerConfig.follow(15, true); // Changed to false since main motor is inverted
+        followerConfig.idleMode(IdleMode.kCoast)
+                     .smartCurrentLimit(40)
+                     .voltageCompensation(12);
+        elevatorFollowerMotor.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        followerConfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .p(0.6)
+            .i(0.002)
+            // .d(0.001)
+           
+            .outputRange(-1, 1)
+            .maxMotion
+            .maxVelocity(6000)
+            .maxAcceleration(5000)
+            .allowedClosedLoopError(0.5);
+        
+        // Set follower motor to follow the main motor in opposite direction
+        elevatorFollowerMotor.isFollower(); // true inverts the following direction
+       
+        zeroEncoder();
     }
 
-    private void configureMotors() {
-        TalonFXConfiguration config = new TalonFXConfiguration();
-
-        // Configure gear ratio and mechanical conversion
-        FeedbackConfigs feedback = config.Feedback;
-        feedback.SensorToMechanismRatio = 5.0; // 5:1 gear reduction
-
-        // Configure Motion Magic
-        MotionMagicConfigs mm = config.MotionMagic;
-        mm.withMotionMagicCruiseVelocity(39.27)
-          .withMotionMagicAcceleration(59.54)
-          .withMotionMagicJerk(100.08);
-
-        // Configure PID values
-        Slot0Configs slot0 = config.Slot0;
-        slot0.kS = 0.25;
-        slot0.kV = 0.02;
-        slot0.kA = 0.01;
-        slot0.kP = 10;
-        slot0.kI = 0;
-        slot0.kD = 1.0;
-
-        // Set to brake mode
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-        // Configure leader motor
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        StatusCode status = StatusCode.StatusCodeNotInitialized;
-        for (int i = 0; i < 5; ++i) {
-            status = leaderMotor.getConfigurator().apply(config);
-            if (status.isOK()) break;
-        }
-        if (!status.isOK()) {
-            System.out.println("Could not configure leader motor. Error: " + status.toString());
-        }
-
-        // Configure follower motor
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        status = StatusCode.StatusCodeNotInitialized;
-        for (int i = 0; i < 5; ++i) {
-            status = followerMotor.getConfigurator().apply(config);
-            if (status.isOK()) break;
-        }
-        if (!status.isOK()) {
-            System.out.println("Could not configure follower motor. Error: " + status.toString());
-        }
-
-        // Set follower to follow leader
-        followerMotor.setControl(new StrictFollower(ElevatorConstants.LEADER_MOTOR_ID));
+    public Command setUp() {
+        return this.run(() -> elevatorMotor.set(0.2));
     }
 
-    public void setTargetPosition(double positionMeters) {
-        targetPosition = positionMeters;
-        leaderMotor.setControl(motionMagicRequest.withPosition(positionMeters / METERS_PER_ROTATION).withSlot(0));
+    public Command setDown() {
+        return this.run(() -> elevatorMotor.set(-0.2));
+    }
+
+    public void setTargetLocation(double targetLocation) {
+        this.targetLocation = targetLocation;
+    }
+
+    public void zeroEncoder() {
+        elevatorMotor.getEncoder().setPosition(0);
     }
 
     // Command wrappers for preset positions
     public Command goToL4Command() {
         return this.runOnce(() -> setTargetPosition(ElevatorConstants.L4_Distance));
+    }
+
+    public Command goToAlgaeL3Command() {
+        return this.runOnce(() -> setTargetLocation(ElevatorConstants.AlgaeL3_Distance));
+    }
+    public Command goToAlgaeL2Command() {
+        return this.runOnce(() -> setTargetLocation(ElevatorConstants.AlgaeL2_Distance));
     }
 
     public Command goToL3Command() {
@@ -108,10 +129,45 @@ public class Elevator extends SubsystemBase {
         return this.runOnce(() -> setTargetPosition(ElevatorConstants.resetPos));
     }
 
+    public void elevatorMoveToDesired(){
+        closedLoopController.setReference(this.targetLocation, ControlType.kMAXMotionPositionControl);
+    }
+
+    public void elevatorMoveToL2(){
+        closedLoopController.setReference(ElevatorConstants.L2_Distance, ControlType.kMAXMotionPositionControl);
+    }
+
+    /* Motion Planning Logic: */ 
     @Override
     public void periodic() {
-        updateDashboard();
+        if (getPosition() <= ElevatorConstants.L2_Distance && targetLocation < ElevatorConstants.L2_Distance) {
+            wrist.resume();
+            elevatorMoveToDesired(); 
+        }
+        else if (getPosition() <= ElevatorConstants.L2_Distance && targetLocation >= ElevatorConstants.L2_Distance) {
+            if (wrist.isAtTarget()||wrist.getCurrentAngle()>WristConstants.Safe_Angle) {
+                elevatorMoveToDesired();
+            } else {
+                wrist.resume();
+                elevatorMoveToL2();
+            }
+        }
+        else if(getPosition() > ElevatorConstants.L2_Distance && targetLocation <= ElevatorConstants.L2_Distance){
+            elevatorMoveToDesired();
+            wrist.holdLastTarget();
+
+            if(getPosition() <= ElevatorConstants.L2_Distance){
+                wrist.resume();
+                
+            }
+        }
+        
+        else if(getPosition() > ElevatorConstants.L2_Distance && targetLocation > ElevatorConstants.L2_Distance){
+            wrist.resume();
+            elevatorMoveToDesired();
+        }
     }
+
 
     private void updateDashboard() {
         SmartDashboard.putNumber("Elevator Position (m)", getPositionMeters());
@@ -119,11 +175,14 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putNumber("Elevator Velocity (m/s)", getVelocityMetersPerSecond());
     }
 
-    public double getPositionMeters() {
-        return leaderMotor.getRotorPosition().getValueAsDouble() * METERS_PER_ROTATION;
+    public void printDashboard() {
+        SmartDashboard.putNumber("Elevator/ Position", elevatorMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Elevator/ Target", targetLocation);
+        SmartDashboard.putNumber("Elevator/Follower Current", elevatorFollowerMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator/Follower Temperature", elevatorFollowerMotor.getMotorTemperature());
     }
 
-    public double getVelocityMetersPerSecond() {
-        return leaderMotor.getRotorVelocity().getValueAsDouble() * METERS_PER_ROTATION;
+    public double getPosition() {  
+        return elevatorMotor.getEncoder().getPosition();
     }
 } 

@@ -3,6 +3,9 @@ package frc.robot.commands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.AlignmentConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -19,11 +22,12 @@ public class AlignToTarget extends Command {
     private final PIDController rotationController;
     private final SwerveRequest.FieldCentric fieldCentric = new SwerveRequest.FieldCentric();
     private static final double ACTIVATION_DISTANCE_METERS = 1;
-    private static final double SLOW_DOWN_DISTANCE_METERS = 0.127; // 5 inches in meters
-    private static final double MAX_SPEED_FAR = 6.0; // Increased from 4.0 to 6.0 m/s
-    private static final double MAX_SPEED_NEAR = 3.0; // Increased from 2.0 to 3.0 m/s
+    private static final double SLOW_DOWN_DISTANCE_METERS = 0.3048; // 12 inches in meters
+    private static final double MAX_SPEED_FAR = 3.0; // Increased from 4.0 to 6.0 m/s
+    private static final double MAX_SPEED_NEAR = 0.25; // Increased from 2.0 to 3.0 m/s
     private static final double MAX_ROTATION_SPEED_FAR = 8.0; // Increased from 4.0 to 8.0 rad/s
     private static final double MAX_ROTATION_SPEED_NEAR = 4.0; // Increased from 2.0 to 4.0 rad/s
+    private boolean isRedAlliance;
 
     public AlignToTarget(CommandSwerveDrivetrain drivetrain, Supplier<Pose2d> targetPoseSupplier) {
         this.drivetrain = drivetrain;
@@ -57,6 +61,11 @@ public class AlignToTarget extends Command {
     @Override
     public void initialize() {
         targetPose = targetPoseSupplier.get();
+        isRedAlliance = DriverStation.getAlliance().isPresent() && 
+                       DriverStation.getAlliance().get() == Alliance.Red;
+        
+        // If on red alliance, invert X and Y coordinates
+      
         xController.setSetpoint(targetPose.getX());
         yController.setSetpoint(targetPose.getY());
         rotationController.setSetpoint(targetPose.getRotation().getRadians());
@@ -71,8 +80,10 @@ public class AlignToTarget extends Command {
             currentPose.getX(), 
             currentPose.getY()
         ).getDistance(
+            
             new Translation2d(
-                targetPose.getX(), 
+                
+            targetPose.getX(), 
                 targetPose.getY()
             )
         );
@@ -105,11 +116,18 @@ public class AlignToTarget extends Command {
 
         // Only run alignment if we're within activation distance
         if (distance <= ACTIVATION_DISTANCE_METERS) {
-            double xSpeed = xController.calculate(currentPose.getX());
-            double ySpeed = yController.calculate(currentPose.getY());
+            double xSpeed = xController.calculate(currentPose.getX(), targetPose.getX());
+            double ySpeed = yController.calculate(currentPose.getY(), targetPose.getY());
             double rotationSpeed = rotationController.calculate(
-                currentPose.getRotation().getRadians()
+                currentPose.getRotation().getRadians(),
+                targetPose.getRotation().getRadians()
             );
+
+            // Invert X and Y speeds if on red alliance since we're using field-oriented control
+            if (isRedAlliance) {
+                xSpeed = -xSpeed;
+                ySpeed = -ySpeed;
+            }
 
             // Calculate speed limits based on distance
             double speedScale;
