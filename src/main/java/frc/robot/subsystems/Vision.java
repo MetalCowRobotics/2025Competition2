@@ -122,7 +122,7 @@ public class Vision extends SubsystemBase {
         }
         
         if (estimate.tagCount == 1 && estimate.rawFiducials.length == 1) {
-            if (estimate.rawFiducials[0].ambiguity > 0.3) {
+            if (estimate.rawFiducials[0].ambiguity > 0.2) {
                 return true;
             }
             if (estimate.rawFiducials[0].distToCamera > maxDistance) {

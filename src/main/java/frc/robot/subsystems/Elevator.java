@@ -40,18 +40,18 @@ public class Elevator extends SubsystemBase {
 
         // Configure Motion Magic
         MotionMagicConfigs mm = config.MotionMagic;
-        mm.withMotionMagicCruiseVelocity(39.27)
-          .withMotionMagicAcceleration(59.54)
-          .withMotionMagicJerk(100.08);
+        mm.withMotionMagicCruiseVelocity(84.27)
+          .withMotionMagicAcceleration(100.54)
+          .withMotionMagicJerk(140.08);
 
         // Configure PID values
         Slot0Configs slot0 = config.Slot0;
-        slot0.kS = 0.25;
+        slot0.kS = 0.4;
         slot0.kV = 0.02;
-        slot0.kA = 0.01;
-        slot0.kP = 12;
+        slot0.kA = 0.001;
+        slot0.kP = 30;
         slot0.kI = 0;
-        slot0.kD = 1.0;
+        slot0.kD = .5;
 
         // Set to brake mode
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
