@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
 import frc.robot.constants.AlignmentConstants;
@@ -53,6 +54,7 @@ public class RobotContainer {
     private final Intake intake = new Intake();
     private final Wrist wrist = new Wrist();
     private final Elevator elevator = new Elevator();
+    private final Climb climber = new Climb();
 
     private final ArmCommands armCommands;
 
@@ -141,6 +143,14 @@ public class RobotContainer {
         // Reverse intake - toggle style
         operatorController.rightBumper().onTrue(
                 intake.stopIntakeCommand().alongWith(armCommands.goToRest())
+        );
+
+        joystick.y().onTrue(
+            climber.startIntakeCommand()
+        );
+
+        joystick.a().onTrue(
+            climber.reverseIntakeCommand()
         );
 
         drivetrain.registerTelemetry(logger::telemeterize);
