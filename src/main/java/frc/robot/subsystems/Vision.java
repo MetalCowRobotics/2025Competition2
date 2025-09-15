@@ -64,7 +64,11 @@ public class Vision extends SubsystemBase {
                 double[] stdDevs = calculateStdDevs(fright);
                 
                 drivetrain.addVisionMeasurement(
-                    fright.pose,
+                    new Pose2d(
+                    fright.pose.getX(),
+                    fright.pose.getY(),
+                    fright.pose.getRotation()
+                    ),
                     fright.timestampSeconds,
                     VecBuilder.fill(stdDevs[0], stdDevs[1], stdDevs[2])
                 );
@@ -78,8 +82,8 @@ public class Vision extends SubsystemBase {
 
         if (estimate.tagCount >= 2) {
             // Multiple tags give us much better confidence
-            xyStdDev = 0.1;
-            thetaStdDev = 0.05;
+            xyStdDev = 0.3;
+            thetaStdDev = 0.2;
             
             // Still adjust for distance to closest tag
             double minDist = Double.POSITIVE_INFINITY;
