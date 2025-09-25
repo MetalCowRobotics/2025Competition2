@@ -145,12 +145,16 @@ public class RobotContainer {
                 intake.stopIntakeCommand().alongWith(armCommands.goToRest())
         );
 
-        joystick.y().onTrue(
-            climber.startIntakeCommand()
-        );
+         joystick.y().onTrue(
+            climber.goToRise()
+         );
 
         joystick.a().onTrue(
-            climber.reverseIntakeCommand()
+            climber.goToRiseRest()
+        );
+        
+        joystick.x().onTrue(
+            climber.goToRest()
         );
 
         drivetrain.registerTelemetry(logger::telemeterize);
