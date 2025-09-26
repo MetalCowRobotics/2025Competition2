@@ -24,7 +24,7 @@ public class Climb extends SubsystemBase {
 
 
     public Climb() {
-        climbMotor = new SparkMax(ClimbConstants.CLIMBCANID, MotorType.kBrushless);
+        climbMotor = new SparkMax(ClimbConstants.CLIMB_CAN_ID, MotorType.kBrushless);
         closedLoopController = climbMotor.getClosedLoopController();
 
         absoluteEncoder = climbMotor.getAbsoluteEncoder();
@@ -33,14 +33,14 @@ public class Climb extends SubsystemBase {
 
         // Config
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true);
+        config.inverted(false);
         config.idleMode(IdleMode.kBrake)
               .smartCurrentLimit(50)
               .voltageCompensation(12);
         config.softLimit
-              .reverseSoftLimit(0.250);
+              .reverseSoftLimit(0.260);
         config.softLimit
-              .forwardSoftLimit(0.530);
+              .forwardSoftLimit(0.590);
 
         // Tell Spark to use absolute encoder
         config.closedLoop
@@ -64,15 +64,15 @@ public class Climb extends SubsystemBase {
 
     // === Preset Commands ===
     public Command goToRise() {
-        return this.runOnce(() -> setTargetLocation(ClimbConstants.climbtargetrise));
+        return this.runOnce(() -> setTargetLocation(ClimbConstants.climbTargetRise));
     }
-
-    public Command goToRiseRest() {
-        return this.runOnce(() -> setTargetLocation(ClimbConstants.climbtargetriserest));
-    }
-
     public Command goToRest() {
-        return this.runOnce(() -> setTargetLocation(ClimbConstants.climbtargetrest));
+        return this.runOnce(() -> setTargetLocation(ClimbConstants.climbTargetRest));
+    }
+    public Command manualClimb(){
+        return this.startEnd(
+            () -> climbMotor.set(0.1), 
+            () -> climbMotor.set(0.0));
     }
 
     @Override

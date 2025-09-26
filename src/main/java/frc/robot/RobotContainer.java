@@ -104,7 +104,7 @@ public class RobotContainer {
             )
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        //joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
 
         
         // X button for left side targets with LED feedback
@@ -148,12 +148,8 @@ public class RobotContainer {
          joystick.y().onTrue(
             climber.goToRise()
          );
-
-        joystick.a().onTrue(
-            climber.goToRiseRest()
-        );
         
-        joystick.x().onTrue(
+        joystick.a().onTrue(
             climber.goToRest()
         );
 

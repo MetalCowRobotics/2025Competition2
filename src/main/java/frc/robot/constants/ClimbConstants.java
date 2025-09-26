@@ -1,10 +1,9 @@
 package frc.robot.constants;
 
 public class ClimbConstants {
-    public static double climbtargetrise = 0.525;
-    public static double climbtargetriserest = 0.290;
-    public static double climbtargetrest = 0.256;
+    public static double climbTargetRise = 0.56;
+    public static double climbTargetRest = 0.29;
 
     //Motor configuartion
-    public static final int CLIMBCANID = 21;
+    public static final int CLIMB_CAN_ID = 21;
 }
