@@ -152,6 +152,9 @@ public class RobotContainer {
         joystick.a().onTrue(
             climber.goToRest()
         );
+        joystick.rightBumper().onTrue(
+            climber.manualClimb()
+        );
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

@@ -33,7 +33,7 @@ public class Climb extends SubsystemBase {
 
         // Config
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(false);
+        config.inverted(true);
         config.idleMode(IdleMode.kBrake)
               .smartCurrentLimit(50)
               .voltageCompensation(12);
@@ -45,13 +45,13 @@ public class Climb extends SubsystemBase {
         // Tell Spark to use absolute encoder
         config.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            .p(1.1)
+            .p(4)
             .i(0.0)
             .d(0.0)
             .outputRange(-1.0, 1.0)
             .maxMotion
-            .maxVelocity(4000)
-            .maxAcceleration(4000)
+            .maxVelocity(5000)
+            .maxAcceleration(8000)
             .allowedClosedLoopError(0.01);
 
         climbMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -70,9 +70,10 @@ public class Climb extends SubsystemBase {
         return this.runOnce(() -> setTargetLocation(ClimbConstants.climbTargetRest));
     }
     public Command manualClimb(){
-        return this.startEnd(
-            () -> climbMotor.set(0.1), 
-            () -> climbMotor.set(0.0));
+        return this.runOnce(() -> setTargetLocation(ClimbConstants.climbTargetClimb));
+        // return this.startEnd(
+        //     () -> climbMotor.set(-0.1), 
+        //     () -> climbMotor.set(0.0));
     }
 
     @Override
