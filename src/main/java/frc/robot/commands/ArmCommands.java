@@ -41,8 +41,18 @@ public final class ArmCommands {
         return elevator.goToRestCommand().alongWith(wrist.goToRestCommand());
     }
 
+    public Command deAlgaeL2(){
+        return elevator.goToL2Command().alongWith(wrist.goForward());
+    }
+    public Command deAlgaeL3(){
+        return elevator.goToL3Command().alongWith(wrist.goForward());
+    }
+
     // Stop All Command
     public Command stopAll() {
         return intake.stopIntakeCommand();
     }
+
+
+
 } 

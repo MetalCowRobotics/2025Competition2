@@ -4,13 +4,13 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLimitSwitch;
-import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,35 +20,62 @@ import frc.robot.constants.WristConstants;
 public class Wrist extends SubsystemBase {
     private final SparkMax wristMotor;
     private final SparkClosedLoopController closedLoopController;
+    private final SparkAbsoluteEncoder absoluteEncoder;
     private double targetLocation = 0;
     private double desiredLocation = 0;
+    private boolean isInSafePosition = false;
+
+    private double kP = 0.5;
+    private double kI = 0.005;
+    private double kD = 1.2;
+
+    // private double kP = 0.28;
+    // private double kI = 0.265;
+    // private double kD = 0.27;
+
+    SparkMaxConfig config;
+    AbsoluteEncoderConfig absoluteEncoderConfig;
+
 
     public Wrist() {
         wristMotor = new SparkMax(WristConstants.WRIST_MOTOR_ID, MotorType.kBrushless);
         closedLoopController = wristMotor.getClosedLoopController();
+        absoluteEncoder = wristMotor.getAbsoluteEncoder();
+        absoluteEncoderConfig = new AbsoluteEncoderConfig();
+        absoluteEncoderConfig.inverted(true);
+  
 
-        SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(false);
-        config.idleMode(IdleMode.kCoast)
-             .smartCurrentLimit(50)
+        this.config = new SparkMaxConfig();
+        config.inverted(true)
+             .idleMode
+             (IdleMode.kBrake)
+             .smartCurrentLimit(40)
              .voltageCompensation(12);
-
+        config.softLimit.forwardSoftLimitEnabled(true);
+        config.softLimit.reverseSoftLimitEnabled(true);
+        config.softLimit.forwardSoftLimit( 0.669);
+        config.softLimit.reverseSoftLimit(0.223);
+        config.apply(absoluteEncoderConfig);
         config.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(0.1)
-            .d(0.08)
-            .i(0.00006)
-            .iZone(0.5)
-            .outputRange(-0.5, 0.5)
+
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+            .p(kP)
+            .i(kI)
+            // .d(kD)
+            .iZone(0.07)
+            .outputRange(-0.2,0.2)
             .maxMotion
-            .maxVelocity(4200)
-            .maxAcceleration(4000)
-            .allowedClosedLoopError(.25);
+            .maxVelocity(700)
+            .maxAcceleration(500)
+            .allowedClosedLoopError(.025);
+    
 
         wristMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        zeroEncoder();
-    }
 
+
+        // closedLoopController.setReference(absoluteEncoder.getPosition(), ControlType.kMAXMotionPositionControl);
+        this.desiredLocation = 0.25;
+    }
     public void setTargetLocation(double targetLocation) {
         this.desiredLocation = targetLocation;
     }
@@ -79,6 +106,11 @@ public class Wrist extends SubsystemBase {
         return this.runOnce(() -> setTargetLocation(WristConstants.Rest_Angle));
     }
 
+    public Command goForward(){
+        return this.runOnce(() -> setTargetLocation(WristConstants.Forward_Angle));
+    }
+
+
     @Override
     public void periodic() {
             resume();
@@ -88,4 +120,5 @@ public class Wrist extends SubsystemBase {
 
     public double getCurrentAngle() {
         return wristMotor.getEncoder().getPosition();
-    }}
+    }
+}

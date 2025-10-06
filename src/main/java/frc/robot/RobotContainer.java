@@ -77,6 +77,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Start Intake", intake.startIntakeCommand());
         NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
         NamedCommands.registerCommand("Reverse Intake", intake.reverseIntakeCommand());
+
         
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -135,6 +136,8 @@ public class RobotContainer {
         operatorController.b().onTrue(armCommands.goToL3());     // L3 position on B
         operatorController.y().onTrue(armCommands.goToL4());     // L4 position on Y
         operatorController.x().onTrue(armCommands.goToSource()); // Source position + intake on X
+        operatorController.leftTrigger().onTrue(armCommands.deAlgaeL2());
+        operatorController.rightTrigger().onTrue(armCommands.deAlgaeL3());
         joystick.leftBumper().onTrue(armCommands.goToRest());   // Rest position on driver left bumper
 
         // Stop intake

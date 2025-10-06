@@ -5,6 +5,7 @@ public final class WristConstants {
     public static final double L3_Angle = 7;
     public static final double Source_Angle = 4.2;
     public static final double Rest_Angle = 0;
+    public static final double Forward_Angle = 6.0;
 
     // Motor configuration
     public static final int WRIST_MOTOR_ID = 19; // Updated to correct CAN ID
