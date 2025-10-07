@@ -46,15 +46,15 @@ public class Wrist extends SubsystemBase {
   
 
         this.config = new SparkMaxConfig();
-        config.inverted(true)
+        config.inverted(false)
              .idleMode
              (IdleMode.kBrake)
              .smartCurrentLimit(40)
              .voltageCompensation(12);
         config.softLimit.forwardSoftLimitEnabled(true);
         config.softLimit.reverseSoftLimitEnabled(true);
-        config.softLimit.forwardSoftLimit( 0.669);
-        config.softLimit.reverseSoftLimit(0.223);
+        config.softLimit.forwardSoftLimit( 0.40);
+        config.softLimit.reverseSoftLimit(0.039);
         config.apply(absoluteEncoderConfig);
         config.closedLoop
 
@@ -74,7 +74,7 @@ public class Wrist extends SubsystemBase {
 
 
         // closedLoopController.setReference(absoluteEncoder.getPosition(), ControlType.kMAXMotionPositionControl);
-        this.desiredLocation = 0.25;
+        this.desiredLocation = 0.04;
     }
     public void setTargetLocation(double targetLocation) {
         this.desiredLocation = targetLocation;
@@ -114,7 +114,7 @@ public class Wrist extends SubsystemBase {
     @Override
     public void periodic() {
             resume();
-        SmartDashboard.putNumber("Wrist Encoder Reading", wristMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Wrist Encoder Reading", wristMotor.getAbsoluteEncoder().getPosition());
         SmartDashboard.putNumber("Wrist Target Location", targetLocation);
     }
 

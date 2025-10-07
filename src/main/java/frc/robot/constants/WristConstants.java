@@ -1,11 +1,11 @@
 package frc.robot.constants;
 
 public final class WristConstants {
-    public static final double L4_Angle = 7.4;
-    public static final double L3_Angle = 7;
-    public static final double Source_Angle = 4.2;
-    public static final double Rest_Angle = 0;
-    public static final double Forward_Angle = 6.0;
+    public static final double L4_Angle = 0.39;
+    public static final double L3_Angle = .34;
+    public static final double Source_Angle = 0.15;
+    public static final double Rest_Angle = 0.04;
+    public static final double Forward_Angle = .260;
 
     // Motor configuration
     public static final int WRIST_MOTOR_ID = 19; // Updated to correct CAN ID
