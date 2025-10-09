@@ -33,7 +33,7 @@ public class Climb extends SubsystemBase {
 
         // Config
         SparkMaxConfig config = new SparkMaxConfig();
-        config.inverted(true);
+        config.inverted(false);
         config.idleMode(IdleMode.kBrake)
               .smartCurrentLimit(50)
               .voltageCompensation(12);
