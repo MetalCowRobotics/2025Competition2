@@ -16,24 +16,19 @@
     },
     {
       "anchor": {
-        "x": 5.301,
-        "y": 5.05
+        "x": 5.3215,
+        "y": 5.12
       },
       "prevControl": {
-        "x": 5.380760163897091,
-        "y": 5.286935257517975
+        "x": 5.401260163897093,
+        "y": 5.356935257517975
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "CoralI"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.8743980935534592,
-      "rotationDegrees": -119.99999999999999
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
