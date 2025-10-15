@@ -4,8 +4,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLimitSwitch;
-import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -63,7 +61,7 @@ public class Wrist extends SubsystemBase {
                 speed = 0;
             }
             // Limit the speed to 30% for safety
-            speed = speed * 0.3;
+            speed = speed * 0.2;
             wristMotor.set(speed);
         }
     }
@@ -119,10 +117,21 @@ public class Wrist extends SubsystemBase {
         return this.runOnce(this::toggleManualControl);
     }
 
+    public Command zeroEncoderAbsCommand() {
+        return this.toggleManualControlCommand()
+    .andThen(this.runOnce(this::toggleManualControl))
+    .andThen(this.run(() -> wristMotor.set(-0.3))
+        .until(() -> wristMotor.getAbsoluteEncoder().getPosition() > 0.9))
+    .andThen(this.runOnce(() -> wristMotor.getEncoder().setPosition(0)))
+    .andThen(this.runOnce(() -> wristMotor.set(0))); // stop motor
+
+    }
+
     @Override
     public void periodic() {
         resume();
         SmartDashboard.putNumber("Wrist Encoder Reading", wristMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Wrist Abs Encoder Reading", wristMotor.getAbsoluteEncoder().getPosition());
         SmartDashboard.putNumber("Wrist Target Location", targetLocation);
         SmartDashboard.putBoolean("Wrist Manual Control", isManualControl);
     }

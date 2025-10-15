@@ -125,7 +125,7 @@ public class RobotContainer {
         operatorController.back().onTrue(wrist.toggleManualControlCommand());
 
         // Zero encoder when start button is pressed
-        operatorController.start().onTrue(wrist.zeroEncoderCommand());
+        operatorController.start().onTrue(wrist.zeroEncoderAbsCommand());
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
 
