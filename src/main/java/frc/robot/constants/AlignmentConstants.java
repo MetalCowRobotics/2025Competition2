@@ -6,16 +6,16 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public final class AlignmentConstants {
     // PID Constants for alignment - Increased for faster response
-    public static final double XY_P = 3.0;  // Increased from 1.0 to 3.0
+    public static final double XY_P = 3.7;  // Increased from 1.0 to 3.0
     public static final double XY_I = 0.0;
-    public static final double XY_D = 0.1;  // Added small derivative gain
+    public static final double XY_D = 0.13;  // Added small derivative gain
 
     public static final double ROTATION_P = 3.0;  // Increased from 1.0 to 3.0
     public static final double ROTATION_I = 0.0;
     public static final double ROTATION_D = 0.1;  // Added small derivative gain
 
     // Tolerance for considering alignment complete
-    public static final double POSITION_TOLERANCE_METERS = 0.05; // 5 cm
+    public static final double POSITION_TOLERANCE_METERS = 0.03; // 5 cm
     public static final double ROTATION_TOLERANCE_DEGREES = 2.0; // 2 degrees
 
     // Left Side Positions

@@ -13,7 +13,7 @@ public class LEDDefaultCommand extends Command {
     private final CommandSwerveDrivetrain drivetrain;
     private final CommandXboxController driverController;
     private final CommandXboxController operatorController;
-    private final double proximityThreshold = 1.0; // 1 meter threshold
+    private final double proximityThreshold = 3.0; // 1 meter threshold
     private final double rotationThreshold = 5.0; // 5 degrees threshold
     private final double translationThreshold = 0.1; // 10cm threshold for final alignment
 

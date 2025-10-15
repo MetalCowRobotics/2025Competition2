@@ -121,7 +121,7 @@ public class Wrist extends SubsystemBase {
         return this.toggleManualControlCommand()
     .andThen(this.runOnce(this::toggleManualControl))
     .andThen(this.run(() -> wristMotor.set(-0.3))
-        .until(() -> wristMotor.getAbsoluteEncoder().getPosition() > 0.9))
+        .until(() -> wristMotor.getAbsoluteEncoder().getPosition() > 0.953))
     .andThen(this.runOnce(() -> wristMotor.getEncoder().setPosition(0)))
     .andThen(this.runOnce(() -> wristMotor.set(0))); // stop motor
 
