@@ -9,6 +9,5 @@ public final class ElevatorConstants {
     public static final double resetPos = 0.0;         // Home position
 
     // Motor configuration
-    public static final int LEADER_MOTOR_ID = 14;
-    public static final int FOLLOWER_MOTOR_ID = 15;
+    public static final int ELEVATOR_MOTOR_ID = 21;
 } 
