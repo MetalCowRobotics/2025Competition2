@@ -5,19 +5,38 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Wrist Out"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": null
+                  "pathName": "ToCoralH"
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Go To L4"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.45
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Go To L4"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -30,13 +49,19 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.4
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": null
+                  "pathName": "CoralHToAlgaeRemove"
                 }
               },
               {
@@ -46,13 +71,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.8
+                        "waitTime": 0.4
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "Go To Source"
+                        "name": "L3 Alage Remove"
                       }
                     }
                   ]
@@ -60,11 +85,29 @@
               }
             ]
           }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HAlgaeToRemove"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RemoveAlgaeH"
+          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Blue Right",
+  "folder": null,
   "choreoAuto": false
 }

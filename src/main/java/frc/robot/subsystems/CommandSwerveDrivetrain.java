@@ -211,7 +211,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 ),
                 new PPHolonomicDriveController(
                     // PID constants for translation
-                    new PIDConstants(10, 0, 0),
+                    new PIDConstants(8, 0, 0),
                     // PID constants for rotation
                     new PIDConstants(7, 0, 0)
                 ),
@@ -328,7 +328,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         
         // Update gyro yaw to match vision when we have high confidence measurements
         double rotationConfidence = visionMeasurementStdDevs.get(2, 0);
-        if (rotationConfidence < 0.1) {  // Only update if rotation confidence is high
+        if (rotationConfidence < 0.06) {  // Only update if rotation confidence is high
             // Calculate the difference between current and vision rotation
             Rotation2d currentRotation = getState().Pose.getRotation();
             Rotation2d visionRotation = visionRobotPoseMeters.getRotation();

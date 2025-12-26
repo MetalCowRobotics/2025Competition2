@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.079713114754098,
-        "y": 1.8792008196721315
+        "x": 5.78,
+        "y": 4.13
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.880942622950819,
-        "y": 2.059016393442623
+        "x": 6.097470632875189,
+        "y": 3.984296756850397
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CoralH"
     },
     {
       "anchor": {
-        "x": 5.21625,
-        "y": 3.0304999999999995
+        "x": 6.28155737704918,
+        "y": 4.025
       },
       "prevControl": {
-        "x": 5.78686475409836,
-        "y": 2.046069672131147
+        "x": 5.816784891305164,
+        "y": 4.207795207870129
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "first"
+      "linkedName": "HAlageReady"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 1.7,
     "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 121.26373169437744
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Blue Right",
+  "folder": "Right",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -178.15238973400534
+    "rotation": 180.0
   },
   "useDefaultConstraints": false
 }
