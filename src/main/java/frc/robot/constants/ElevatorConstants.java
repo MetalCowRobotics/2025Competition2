@@ -1,14 +1,16 @@
 package frc.robot.constants;
 
 public final class ElevatorConstants {
-    // Positions in meters
-    public static final double Source_Distance = 0.14; // ~10 inches
-    public static final double L2_Distance = 0.16;     // ~14 inches
-    public static final double L3_Distance = 0.35;     // ~23 inches
-    public static final double L4_Distance = 0.78;     // ~31 inches
-    public static final double resetPos = 0.0;         // Home position
+  
+    public static final double Source_Distance = 7.55;
+    public static final double L2_Distance = 9;
+    public static final double L3_Distance = 22.1;
+    public static final double L4_Distance = 44.1;
+    public static final double AlgaeL3_Distance = 19;
+    public static final double AlgaeL2_Distance = 9;
+    public static final double resetPos = 0;
 
     // Motor configuration
-    public static final int LEADER_MOTOR_ID = 14;
-    public static final int FOLLOWER_MOTOR_ID = 15;
+    public static final int ELEVATOR_MOTOR_ID = 15; 
+    public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 21;
 } 

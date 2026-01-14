@@ -4,64 +4,89 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Vision;
-import frc.robot.constants.AlignmentConstants;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.AlignToTarget;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Wrist;
-import frc.robot.subsystems.Elevator;
 import frc.robot.commands.ArmCommands;
-import com.pathplanner.lib.auto.NamedCommands;
-import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.commands.LEDDefaultCommand;
+import frc.robot.constants.AlignmentConstants;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climb;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Wrist;
 
 public class RobotContainer {
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    /* Constants */
+    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)/2; // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond); // 1/2 of a rotation per second
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
+    private double CrawlMaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)/4; // kSpeedAt12Volts desired top speed
+    private double CrawlMaxAngularRate = RotationsPerSecond.of(0.5).in(RadiansPerSecond)/2; // 1/2 of a rotation per second
+
+    /* Drive Request Objcets */
+    private final SwerveRequest.FieldCentric fieldCentricDrive = new SwerveRequest.FieldCentric()
+            .withDeadband(MaxSpeed * 0.1)// Accounts for 10% deadband from the movement joystick
+            .withRotationalDeadband(MaxAngularRate * 0.1) // Accounts for 10% deadband from the rotational joystick
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors making it respond from raw inputs
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-    private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
+    private final SwerveRequest.RobotCentric robotCentricDrive = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(0); // Driver controller
+    /* Controllers */
+    private final CommandXboxController driverController = new CommandXboxController(0); // Driver controller
     private final CommandXboxController operatorController = new CommandXboxController(1); // Operator controller
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    /* Vision */
     private final Vision vision;
+    private final LEDSubsystem ledSubsystem = new LEDSubsystem(0);
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
+    private final SendableChooser<String> autoLocationChooser;
 
+    /* Subsystems */
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private final Intake intake = new Intake();
     private final Wrist wrist = new Wrist();
-    private final Elevator elevator = new Elevator();
+    private final Elevator elevator = new Elevator(wrist);
+    private final Climb climb = new Climb();
+    double targetPosition = 0;
 
+    /* Commands */
     private final ArmCommands armCommands;
-
-    private final LEDSubsystem ledSubsystem = new LEDSubsystem(0);
 
     public RobotContainer() {
         // Create vision subsystem after drivetrain
         vision = new Vision(drivetrain);
         
+        SmartDashboard.putNumber("Max Speed:", MaxSpeed);
+        SmartDashboard.putNumber("Max Angular Rate:", MaxAngularRate);
         // Initialize arm commands
         armCommands = new ArmCommands(elevator, wrist, intake);
         
@@ -75,79 +100,182 @@ public class RobotContainer {
         NamedCommands.registerCommand("Start Intake", intake.startIntakeCommand());
         NamedCommands.registerCommand("Stop Intake", intake.stopIntakeCommand());
         NamedCommands.registerCommand("Reverse Intake", intake.reverseIntakeCommand());
-        
+        NamedCommands.registerCommand("Stall Intake", intake.stallIntakeCommand());
+        NamedCommands.registerCommand("Wrist Out", wrist.goForwardCommand());
+        NamedCommands.registerCommand("L3 Alage Remove", armCommands.goToAlgaeL3());
+        NamedCommands.registerCommand("L2 Alage Remove", armCommands.goToAlgaeL2());
+        NamedCommands.registerCommand("Intake Hold", intake.startIntakeCommand());
+
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
+        autoLocationChooser = new SendableChooser<>();
+        autoLocationChooser.addOption("Left", new String("Left"));
+        autoLocationChooser.addOption("Center", new String("Center"));
+        autoLocationChooser.addOption("Right", new String("Right"));
+
+        SmartDashboard.putData("Auto Location", autoLocationChooser);
 
         // Set default command for LEDs
         ledSubsystem.setDefaultCommand(new LEDDefaultCommand(
             ledSubsystem, 
             drivetrain, 
-            joystick, 
+            driverController, 
             operatorController
         ));
 
         configureBindings();
+
+        AlignmentConstants.printPositions();
     }
 
     private void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
+            drivetrain.applyRequest(() -> {
+
+                double distanceToReef = new Translation2d(
+                    drivetrain.getState().Pose.getX(), 
+                    drivetrain.getState().Pose.getY()
+                ).getDistance(
+                    new Translation2d(
+                        AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getX(), 
+                        AlignmentConstants.findClosestTarget(drivetrain.getState().Pose).getY()
+                    )
+                );
+
+                if (driverController.rightTrigger().getAsBoolean()) {
+                    return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed / 2) 
+                                            .withVelocityY(-driverController.getLeftX() * MaxSpeed / 2) 
+                                            .withRotationalRate(-driverController.getRightX() * CrawlMaxAngularRate);
+
+                } 
+                else if(driverController.leftTrigger().getAsBoolean() && (Math.abs(driverController.getLeftY())>0.3 || Math.abs(driverController.getLeftX())>0.3)){
+                    return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed * 1.7) 
+                    .withVelocityY(-driverController.getLeftX() * MaxSpeed * 1.7) 
+                    .withRotationalRate(-driverController.getRightX() * MaxAngularRate);
+                }
+                else {
+                    return fieldCentricDrive.withVelocityX(-driverController.getLeftY() * MaxSpeed) 
+                                            .withVelocityY(-driverController.getLeftX() * MaxSpeed) 
+                                            .withRotationalRate(-driverController.getRightX() * MaxAngularRate * 3/4);
+                }
+            })
         );
-
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-
-        
-        // X button for left side targets with LED feedback
-        joystick.x().whileTrue(
+ 
+        // Left Align Button 
+        driverController.x().whileTrue(
             new AlignToTarget(drivetrain, () -> {
                 var currentPose = drivetrain.getState().Pose;
                 return AlignmentConstants.findClosestLeftTarget(currentPose);
             })
         );
 
-        // B button for right side targets with LED feedback
-        joystick.b().whileTrue(
+        // Right Align Button
+        driverController.b().whileTrue(
             new AlignToTarget(drivetrain, () -> {
                 var currentPose = drivetrain.getState().Pose;
                 return AlignmentConstants.findClosestRightTarget(currentPose);
             })
         );
 
-        joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        // Robot Centric Drive If Requested
+        driverController.pov(0).whileTrue(drivetrain.applyRequest(() ->
+            robotCentricDrive.withVelocityX(0.5).withVelocityY(0))
         );
-        joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+        driverController.pov(180).whileTrue(drivetrain.applyRequest(() ->
+            robotCentricDrive.withVelocityX(-0.5).withVelocityY(0))
         );
 
-        // Combined elevator and wrist controls for all positions
-        operatorController.a().onTrue(armCommands.goToL2());     // L2 position on A
-        operatorController.b().onTrue(armCommands.goToL3());     // L3 position on B
-        operatorController.y().onTrue(armCommands.goToL4());     // L4 position on Y
-        operatorController.x().onTrue(armCommands.goToSource()); // Source position + intake on X
-        joystick.leftBumper().onTrue(armCommands.goToRest());   // Rest position on driver left bumper
+        /* Operator Commands */
 
-        // Stop intake
-        operatorController.leftBumper().onTrue(intake.reverseIntakeCommand());
+        // Makes L4 Only Available When 1 Meter Close to Reef
+
+        // not using currently since robot doesn't have limelights on it
+        // operatorController.y().onTrue(
+        //     new InstantCommand(() -> {
+        //         if (distance < 1.25) {
+        //             armCommands.goToL4();
+        //         }
+        //     })
+        // );
+
+        operatorController.y().onTrue(armCommands.goToL4());
         
+        // L4 position on Y
+        operatorController.x().onTrue(armCommands.goToSource()); // Source position on X
+        operatorController.b().onTrue(armCommands.goToL3());     // L4 position on Y
+        operatorController.a().onTrue(armCommands.goToL2());
         // Reverse intake - toggle style
         operatorController.rightBumper().onTrue(
                 intake.stopIntakeCommand().alongWith(armCommands.goToRest())
         );
 
+        operatorController.rightTrigger().onTrue(armCommands.goToAlgaeL2()); // Remove algae from L2 on Right Trigger
+        operatorController.leftTrigger().onTrue(armCommands.goToAlgaeL3()); // Remove algae from L3 on Right Trigger
+
+        // Manual Control On Intake
+        operatorController.leftBumper().onTrue(intake.reverseIntakeCommand()); // Release Coral on Left Bumper
+        operatorController.rightBumper().onTrue(intake.stallIntakeCommand());  // Keep Coral In on Right Bumper
+        operatorController.start().onTrue(intake.stopIntakeCommand());
+        
+        // Rest position on driver left bumper
+        driverController.leftBumper().onTrue(armCommands.goToRest()); // Home Position
+
+        // Climb Control
+        driverController.a().whileTrue(climb.runClimb());
+        driverController.y().whileTrue(climb.reverseClimb());
+
+        // Telementry Update
         drivetrain.registerTelemetry(logger::telemeterize);
+
+
+
+
+        // Manual Controls for Elevator
+        // while (operatorController.getLeftY() > 0.3){
+        //     double currentElevatorPosition = elevator.getPosition();
+        //     targetPosition = currentElevatorPosition + 0.2;
+            
+        //     elevator.runOnce(() -> elevator.setTargetLocation(targetPosition));
+        //     elevator.elevatorMoveToDesired();
+        // }
+
+        // while (operatorController.a().getAsBoolean()){
+        //     double currentElevatorPosition = elevator.getPosition();
+        //     targetPosition = currentElevatorPosition - 1;
+
+
+        //     elevator.setTargetLocation(targetPosition);
+        //     elevator.elevatorMoveToDesired();
+        // }
+
+
+
+
+
+        // Manual Control on Elevator
+        // if(operatorController.getLeftY()>0.1){
+        //     elevator.setUp();
+        // }
+
+        // if(operatorController.getLeftY()<-0.1){
+        //     elevator.setDown();
+        // }
+        
+        // if(operatorController.start().getAsBoolean()){
+        //     elevator.zeroEncoder();
+        // }
     }
 
     public Command getAutonomousCommand() {
-        /* Run the path selected from the auto chooser */
-        return autoChooser.getSelected();
+        try{
+            if(autoLocationChooser.getSelected().equals("Right")){
+                return new PathPlannerAuto(autoChooser.getSelected().getName(), true);
+            }else{
+                return new PathPlannerAuto(autoChooser.getSelected().getName(), false);
+            }
+        }catch(Exception e){
+                DriverStation.reportError("PathPlanner ERROR: " + e.getMessage(), e.getStackTrace());
+                return null;
+        }
     }
 }
